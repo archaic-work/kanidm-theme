@@ -490,6 +490,10 @@ hr {
  * consecutively. Keep the first, discard the duplicated second rule.
  * This targets only adjacent ornamental rules; no content is removed.
  */
+/* The first credential subsection starts below the page heading.
+ * It needs spacing, not another rule immediately after the masthead.
+ */
+#credentialUpdateStatusForm > hr.my-4:first-of-type,
 #credentialUpdateStatusForm > hr.my-4 + hr.my-4 {
   display: none;
 }

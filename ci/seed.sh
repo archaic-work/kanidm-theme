@@ -30,7 +30,7 @@ recover_password() {
     jq -er '.output // .password // empty')"
   [[ -n "$password" ]] || { echo "Failed to recover fixture account" >&2; exit 1; }
   if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-    printf '::add-mask::%s\n' "$password"
+    printf '::add-mask::%s\n' "$password" >&2
   fi
   printf '%s' "$password"
 }

@@ -79,7 +79,45 @@ spec:
       readOnly: true
 ```
 
-Create the ConfigMap with an `override.css` key. A rollout is needed after CSS changes because Kubernetes `subPath` mounts do not receive live ConfigMap updates.
+### Reusable Kustomize distribution
+
+The repository root is a Kustomize base. It generates a content-hashed
+`kanidm-theme` ConfigMap in namespace `kanidm` containing `override.css`.
+Consumers can use this Git repository without publishing a container image
+or copying CSS into their GitOps repositories.
+
+In the consuming `kustomization.yaml`, add a `resources` entry pinned to a
+**full commit SHA** (do not follow `main` automatically):
+
+```yaml
+resources:
+  - https://github.com/archaic-work/kanidm-theme.git?ref=<40-character-commit-sha>
+```
+
+Keep the Kaniop volume reference at the *base* name `kanidm-theme`, not the
+generated hashed name. Kustomize must be taught the CRD's ConfigMap reference
+via the consuming project's `configurations` / `nameReference` rule:
+
+```yaml
+nameReference:
+  - kind: ConfigMap
+    version: v1
+    fieldSpecs:
+      - kind: Kanidm
+        group: kaniop.rs
+        version: v1beta1
+        path: spec/volumes/configMap/name
+```
+
+Render the consuming overlay with `kustomize build` or `kubectl kustomize`
+and verify `spec.volumes[].configMap.name` matches the generated ConfigMap.
+
+To update: review and merge the theme changes, copy the new theme commit SHA
+into the consuming GitOps repository, verify the rendered manifests, then
+merge its separate deployment PR. A rollout is needed after CSS changes
+because Kubernetes `subPath` mounts do not receive live ConfigMap updates.
+Confirm Kaniop recreates the Kanidm Pod or restart it in a controlled
+maintenance window.
 
 ## Security
 

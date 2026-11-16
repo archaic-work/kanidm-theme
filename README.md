@@ -30,9 +30,9 @@ Kanidm defaults its display name to `Kanidm <hostname>`. The disposable CI
 fixture explicitly sets it to `archaic.work` with the supported
 `kanidm system domain set-displayname "archaic.work" -D <admin-account>`
 command; it does **not** rename the domain, change the origin, or affect
-production. An administrator can apply the same display-name choice to the
-production Kanidm domain separately, after considering its use in OAuth and
-TOTP issuer labels. The browser title suffix and some internal UI text still
+production. The domain configuration account (`admin`, distinct from `idm_admin`)
+can apply the same display-name choice to production separately, after
+considering its use in OAuth and TOTP issuer labels. The browser title suffix and some internal UI text still
 come from upstream templates.
 
 **CSS-only limitation:** Kanidm's HTML templates still provide browser tab

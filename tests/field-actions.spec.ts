@@ -95,3 +95,29 @@ test("email Remove action follows the editable input, including at 320px", async
   await expectActionAtFieldEnd(input, action, true);
   await capture(page, info, "email-edit-320-fixture");
 });
+
+test("credential reset submits at the token input's right edge, even at 320px", async ({ page }, info) => {
+  await page.goto("/ui/reset");
+  const token = page.locator("#cred-reset-form #token");
+  const submit = page.locator('#cred-reset-form > p.d-flex > button[type="submit"]');
+  const back = page.getByRole("button", { name: "Return home" });
+
+  await expect(token).toBeVisible();
+  await expect(submit).toBeVisible();
+  await expect(back).toBeVisible();
+
+  for (const width of [null, 320]) {
+    if (width) await page.setViewportSize({ width, height: 780 });
+    const inputBox = await bounds(token);
+    const submitBox = await bounds(submit);
+    const backBox = await bounds(back);
+
+    // Submit follows the field, aligned to its right edge. Back stays left.
+    expect(submitBox.top).toBeGreaterThanOrEqual(inputBox.bottom - 2);
+    expect(Math.abs(submitBox.right - inputBox.right)).toBeLessThanOrEqual(3);
+    expect(Math.abs(backBox.left - inputBox.left)).toBeLessThanOrEqual(3);
+    expect(submitBox.left).toBeGreaterThanOrEqual(inputBox.left - 2);
+
+    await capture(page, info, width ? "credential-reset-submit-320" : "credential-reset-submit");
+  }
+});

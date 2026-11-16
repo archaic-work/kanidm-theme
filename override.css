@@ -128,13 +128,53 @@ footer.footer {
   background: var(--bs-body-bg) !important;
 }
 
+[data-bs-theme="dark"] .btn-primary {
+  --bs-btn-color: #101b2c;
+  --bs-btn-hover-color: #101b2c;
+  --bs-btn-active-color: #101b2c;
+}
+
 @media (max-width: 575px) {
   .form-signin {
     width: calc(100% - 1.2rem);
     padding: 1.35rem;
   }
 
+  /* Kanidm's mobile profile sidebar is tall; make it compact and scrollable. */
   .side-menu {
     min-width: 0;
+    max-width: 100%;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    column-gap: 0.35rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-block: 0.35rem;
+  }
+
+  .side-menu > li {
+    flex: 0 0 auto;
+  }
+
+  .side-menu-item {
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .side-menu-item .icon-container {
+    display: none !important;
+  }
+
+  #settings-window {
+    padding-top: 1.1rem !important;
+  }
+
+  nav.navbar .navbar-brand {
+    font-size: 1rem;
+  }
+
+  nav.navbar img.navbar-toggler-img {
+    height: 30px;
   }
 }

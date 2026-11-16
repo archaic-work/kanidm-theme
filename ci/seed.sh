@@ -35,6 +35,16 @@ recover_password() {
   printf '%s' "$password"
 }
 
+# Domain configuration requires the built-in admin account, which is
+# distinct from idm_admin (the account for person/group management).
+domain_admin="admin@localhost"
+domain_admin_password="$(recover_password admin)"
+cli login -D "$domain_admin" --password "$domain_admin_password"
+
+# Match the site identity shown in screenshots. Only the disposable display
+# name changes; its DNS domain and authentication origin stay localhost.
+cli system domain set-displayname "archaic.work" -D "$domain_admin"
+
 admin_password="$(recover_password idm_admin)"
 admin="idm_admin@localhost"
 cli login -D "$admin" --password "$admin_password"

@@ -48,5 +48,14 @@ export default defineConfig({
         defaultBrowserType: "chromium",
       },
     },
+    {
+      name: "mobile-dark",
+      use: {
+        ...devices["Pixel 7"],
+        ...common,
+        colorScheme: "dark",
+        defaultBrowserType: "chromium",
+      },
+    },
   ],
 });

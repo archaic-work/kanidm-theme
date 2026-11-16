@@ -87,6 +87,7 @@ test("Bouncer branding follows heading colors and hides the upstream footer", as
     : "rgb(36, 41, 34)";
 
   await page.goto("/ui/login");
+  await expect(page.locator("#main.form-signin > h3")).toHaveText("archaic.work");
   await expect(page.locator("#main.form-signin > img.kanidm_logo")).toBeHidden();
   await expect(page.locator("footer.footer")).toBeHidden();
 
@@ -119,4 +120,96 @@ test("Bouncer branding follows heading colors and hides the upstream footer", as
   });
   expect(navMark.color).toBe(headingColor);
   expect(navMark.mask).toContain("data:image/svg+xml");
+});
+
+test("Heritage type roles, title separator and primary Save semantics", async ({ page }) => {
+  const dark = test.info().project.name.includes("dark");
+  const primaryColor = dark ? "rgb(147, 197, 223)" : "rgb(40, 91, 120)";
+  const disabledColor = dark ? "rgb(35, 43, 39)" : "rgb(237, 240, 235)";
+
+  await page.goto("/ui/login");
+  const loginRule = await page.locator("#main.form-signin").evaluate((el) => ({
+    top: getComputedStyle(el).borderTopWidth,
+    bottom: getComputedStyle(el.querySelector("h3")!).borderBottomWidth,
+  }));
+  expect(loginRule).toEqual({ top: "0px", bottom: "3px" });
+
+  await page.goto("/ui/reset");
+  const resetRule = await page.locator("#cred-reset-form center h3").evaluate(
+    (el) => getComputedStyle(el).borderBottomWidth,
+  );
+  expect(resetRule).toBe("3px");
+
+  await signIn(page);
+  await page.goto("/ui/update_credentials");
+  const typography = await page.evaluate(() => ({
+    heading: getComputedStyle(document.querySelector("#settings-window h2")!).fontWeight,
+    headingFamily: getComputedStyle(document.querySelector("#settings-window h2")!).fontFamily,
+    proseFamily: getComputedStyle(document.querySelector(".form-cred-reset-body > div > p")!).fontFamily,
+    explanatoryFamily: getComputedStyle(document.querySelector("#credentialUpdateStatusForm p")!).fontFamily,
+    actionFamily: getComputedStyle(document.querySelector("#cred-update-commit-bar button")!).fontFamily,
+  }));
+  expect(typography.heading).toBe("500");
+  expect(typography.headingFamily).toContain("sans-serif");
+  expect(typography.proseFamily).toContain("sans-serif");
+  expect(typography.explanatoryFamily).toContain("serif");
+  expect(typography.actionFamily).toContain("sans-serif");
+
+  // Kanidm names this action btn-success, but its role is primary rather than
+  // successful status. Check both enabled and disabled theme tokens.
+  const colors = await page.locator('#cred-update-commit-bar button[hx-post="/ui/api/cu_commit"]').evaluate((el) => {
+    // Resolve the inherited Bootstrap custom properties as actual colors.
+    const swatch = document.createElement("span");
+    swatch.style.backgroundColor = "var(--bs-btn-bg)";
+    el.append(swatch);
+    const normal = getComputedStyle(swatch).backgroundColor;
+    swatch.style.backgroundColor = "var(--bs-btn-disabled-bg)";
+    const disabled = getComputedStyle(swatch).backgroundColor;
+    swatch.remove();
+    return { normal, disabled };
+  });
+  expect(colors.normal).toBe(primaryColor);
+  expect(colors.disabled).toBe(disabledColor);
+});
+
+test("admin overview row actions remain reachable at 320px", async ({ page }) => {
+  await signIn(page, "admin");
+  await page.setViewportSize({ width: 320, height: 800 });
+
+  for (const [route, rows] of [
+    ["/ui/admin/persons", "#persons"],
+    ["/ui/admin/groups", "#groups"],
+  ] as const) {
+    await page.goto(route);
+    const menuIcons = page.locator("#main > main.container-xxl .list-group.side-menu img");
+    expect(await menuIcons.count()).toBeGreaterThan(0);
+    await expect(menuIcons.first()).toBeHidden();
+    const table = page.locator(`#settings-window table:has(> tbody${rows})`);
+    await expect(table).toBeVisible();
+    await expect(table.locator("tbody tr button").first()).toBeVisible();
+    const hierarchy = await page.locator('#settings-window > nav[aria-label="breadcrumb"]').evaluate((nav) => ({
+      title: Number.parseFloat(getComputedStyle(nav.querySelector('[aria-current="page"]')!).fontSize),
+      section: Number.parseFloat(getComputedStyle(nav.parentElement!.querySelector("h4")!).fontSize),
+      rule: getComputedStyle(nav).borderBottomWidth,
+    }));
+    expect(hierarchy.title).toBeGreaterThan(hierarchy.section);
+    expect(hierarchy.rule).toBe("3px");
+
+    const geometry = await table.evaluate((element) => {
+      const panel = element.closest("#settings-window")! as HTMLElement;
+      const actionCell = element.querySelector("tbody tr td:last-child")! as HTMLElement;
+      const action = actionCell.querySelector("button")!;
+      const first = action.getBoundingClientRect();
+      const sticky = getComputedStyle(actionCell).position;
+      const overflow = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      panel.scrollLeft = panel.scrollWidth;
+      const scrolled = action.getBoundingClientRect();
+      return { sticky, firstRight: first.right, scrolledRight: scrolled.right, viewport: innerWidth, overflow };
+    });
+
+    expect(geometry.sticky).toBe("sticky");
+    expect(geometry.firstRight).toBeLessThanOrEqual(geometry.viewport);
+    expect(geometry.scrolledRight).toBeLessThanOrEqual(geometry.viewport);
+    expect(geometry.overflow).toBeLessThanOrEqual(2);
+  }
 });

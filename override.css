@@ -924,9 +924,11 @@ hr {
 /* Preserve danger semantics for account deletion. Discarding an
  * uncommitted edit is a secondary action, not an account deletion.
  */
+/* The template already places an <hr> above Save/Discard:
+ * a second toast border would create two adjacent separators.
+ */
 #cred-update-commit-bar {
   border: 0;
-  border-top: 1px solid var(--archaic-rule);
   background: var(--archaic-paper) !important;
   max-width: 100%;
   width: 100%;

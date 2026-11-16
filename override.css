@@ -551,10 +551,18 @@ hr {
   margin-bottom: 1.75rem;
 }
 
+/* The primary action submits the token input, so it belongs at the
+ * inline-end of that field. Keep the secondary navigation at the start.
+ * margin-inline-start:auto also right-aligns Submit when the buttons wrap.
+ */
 #cred-reset-form > p.d-flex {
-  justify-content: flex-start !important;
+  justify-content: space-between !important;
   column-gap: 0.9rem;
   row-gap: 0.7rem;
+}
+
+#cred-reset-form > p.d-flex > .btn-primary {
+  margin-inline-start: auto;
 }
 
 /* Application links should behave like a compact directory, not

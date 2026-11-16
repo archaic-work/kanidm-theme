@@ -100,8 +100,8 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 3px solid var(--archaic-blue) !important;
-  outline-offset: 3px;
+  outline: 2px solid var(--archaic-blue) !important;
+  outline-offset: 2px;
 }
 
 ::selection {
@@ -179,11 +179,11 @@ footer.footer a {
 }
 
 #main :is(h2, h3, h4) {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 #main h2 {
-  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
 }
 
 hr {
@@ -199,7 +199,7 @@ hr {
   background: transparent;
   border: 0;
   border-top: 3px solid var(--archaic-ink);
-  border-bottom: 1px solid var(--archaic-rule);
+  border-bottom: 0;
   border-radius: 0;
   box-shadow: none;
   align-items: stretch !important;
@@ -215,7 +215,8 @@ hr {
 
 .form-signin > h3 {
   align-self: stretch;
-  font-size: clamp(1.65rem, 3vw, 2.1rem);
+  font-size: clamp(1.55rem, 3vw, 1.95rem);
+  font-weight: 500;
   margin-bottom: 1.6rem;
 }
 
@@ -230,7 +231,7 @@ hr {
 }
 
 .form-signin .form-label {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .form-signin .form-check {
@@ -296,7 +297,7 @@ hr {
 }
 
 .btn {
-  font-weight: 600;
+  font-weight: 500;
   min-height: 2.5rem;
 }
 
@@ -379,7 +380,7 @@ hr {
   color: var(--archaic-ink) !important;
   background: var(--archaic-tint) !important;
   border-inline-start-color: var(--archaic-ink);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .list-group.side-menu .list-group-item {
@@ -436,7 +437,7 @@ hr {
 }
 
 .table thead {
-  border-bottom: 3px solid var(--archaic-ink);
+  border-bottom: 1px solid var(--archaic-rule);
 }
 
 .table > :not(caption) > * > * {
@@ -475,6 +476,215 @@ hr {
 
 .alert-success {
   border-left-color: var(--archaic-success);
+}
+
+
+/* Quiet hierarchy: avoid repeating the template's page-title divider.
+ * Credential-update partials supply their own internal section separators.
+ */
+#settings-window > hr {
+  display: none;
+}
+
+/* Kanidm renders the warning separator and the Passkeys separator
+ * consecutively. Keep the first, discard the duplicated second rule.
+ * This targets only adjacent ornamental rules; no content is removed.
+ */
+#credentialUpdateStatusForm > hr.my-4 + hr.my-4 {
+  display: none;
+}
+
+#credentialUpdateStatusForm hr.my-4 {
+  margin-block: 1.35rem !important;
+}
+
+#settings-window .form-cred-reset-body strong,
+#user_settings_container .fw-bold,
+#user_settings_container label.fw-bold,
+#main h6 b {
+  font-weight: 500 !important;
+}
+
+#settings-window > div > h2 {
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  margin-bottom: 1.15rem;
+}
+
+#credentialUpdateStatusForm h4 {
+  font-size: 1.22rem;
+  font-weight: 500;
+}
+
+#credentialUpdateStatusForm h6 {
+  font-weight: 500;
+}
+
+/* The reset template uses <center> for its logo and two titles.
+ * CSS alone can restore one coherent left-aligned form column.
+ */
+#cred-reset-form center {
+  display: block;
+  text-align: left;
+}
+
+#cred-reset-form center .kanidm_logo {
+  display: block;
+  margin: 0 0 1.25rem;
+}
+
+#cred-reset-form center h2 {
+  color: var(--archaic-muted-ink);
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0;
+}
+
+#cred-reset-form center h3 {
+  font-size: clamp(1.55rem, 3vw, 1.95rem);
+  font-weight: 500;
+  margin-bottom: 1.75rem;
+}
+
+#cred-reset-form > p.d-flex {
+  justify-content: flex-start !important;
+  column-gap: 0.9rem;
+  row-gap: 0.7rem;
+}
+
+/* Application links should behave like a compact directory, not
+ * oversized centered promotional cards. Retain real OAuth2 icons.
+ */
+#main > main.container-lg > .row:has(.oauth2-img) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+#main > main.container-lg > .row:has(.oauth2-img) > .col-md-3 {
+  width: auto;
+  max-width: none;
+  padding: 0;
+}
+
+#main .card.text-center:has(.oauth2-img) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 4.5rem;
+  padding: 0.8rem;
+  text-align: left !important;
+  border-top: 1px solid var(--archaic-rule);
+}
+
+#main .card.text-center:has(.oauth2-img) > a {
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#main .card.text-center:has(.oauth2-img) .oauth2-img {
+  display: block;
+  width: 2.6rem;
+  height: 2.6rem;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  padding: 0.1rem;
+}
+
+#main .card.text-center:has(.oauth2-img) .oauth2-img[src*="icon-oauth2.svg"] {
+  filter: grayscale(1);
+  opacity: 0.8;
+}
+
+#main .card.text-center:has(.oauth2-img) label {
+  display: block;
+  min-width: 0;
+  color: var(--archaic-ink);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+#main .card.text-center:has(.oauth2-img):hover {
+  background: var(--archaic-tint);
+  border-color: var(--archaic-blue);
+}
+
+/* Dense administration: let field and row content carry the emphasis. */
+#main > main.container-xxl .list-group.side-menu img {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+#main > main.container-xxl h4 {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+#main > main.container-xxl .table {
+  --bs-table-striped-bg: transparent;
+}
+
+#main > main.container-xxl .table :is(th, td) {
+  padding-block: 0.55rem;
+  vertical-align: middle;
+}
+
+#main > main.container-xxl .table .btn-danger {
+  --bs-btn-color: var(--archaic-error);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-hover-color: var(--archaic-on-status);
+  --bs-btn-hover-bg: var(--archaic-error);
+  --bs-btn-hover-border-color: var(--archaic-error);
+  --bs-btn-active-bg: var(--archaic-error);
+}
+
+/* Preserve danger semantics for account deletion. Discarding an
+ * uncommitted edit is a secondary action, not an account deletion.
+ */
+#cred-update-commit-bar {
+  border: 0;
+  border-top: 1px solid var(--archaic-rule);
+  background: var(--archaic-paper) !important;
+  max-width: 100%;
+  width: fit-content;
+}
+
+#cred-update-commit-bar .toast-body {
+  padding: 0.75rem 0;
+}
+
+#cred-update-commit-bar .btn-danger {
+  --bs-btn-color: var(--archaic-muted-ink);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-hover-color: var(--archaic-ink);
+  --bs-btn-hover-bg: var(--archaic-tint);
+  --bs-btn-hover-border-color: var(--archaic-rule);
+}
+
+#cred-update-commit-bar .btn-success {
+  --bs-btn-color: var(--archaic-on-blue);
+  --bs-btn-bg: var(--archaic-blue);
+  --bs-btn-border-color: var(--archaic-blue);
+  --bs-btn-hover-color: var(--archaic-paper);
+  --bs-btn-hover-bg: var(--archaic-ink);
+  --bs-btn-hover-border-color: var(--archaic-ink);
+}
+
+/* Focus is one clean ring, rather than a blue border plus blue outline. */
+:is(.form-control, .form-select):focus-visible {
+  border-color: var(--archaic-input-border);
 }
 
 /* Mobile: compact scrollable navigation, independent content region. */
@@ -541,6 +751,31 @@ hr {
   #main > main.container-xxl {
     padding-inline: 1rem;
   }
+
+  /* Keep the person creation form usable on a phone. */
+  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group > input {
+    width: 100%;
+    min-width: 0;
+    border-radius: 0;
+  }
+
+  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group > button {
+    align-self: flex-start;
+    width: auto;
+    border-radius: 0;
+  }
+
+  /* Long UUIDs and group names scroll inside their admin content area. */
+  #main > main.container-xxl #settings-window .table :is(th, td) {
+    white-space: nowrap;
+  }
+
 }
 
 @media (max-width: 22rem) {

@@ -39,6 +39,12 @@ jobs:
       - name: Seed deterministic fixture data
         run: bash ci/seed.sh
 
+      - name: Require complete baseline coverage once baselines exist
+        run: |
+          if find tests -type f -path '*-snapshots/*.png' -print -quit | grep -q .; then
+            echo "STRICT_VISUAL_BASELINES=1" >> "$GITHUB_ENV"
+          fi
+
       - name: Capture screenshots and compare approved baselines
         run: npx playwright test
 

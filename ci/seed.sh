@@ -43,7 +43,7 @@ cli group create theme_apps -D "$admin"
 cli person create theme_user "Theme Demo User" -D "$admin"
 cli person update theme_user --mail theme.user@example.test -D "$admin"
 cli group add-members theme_apps theme_user -D "$admin"
-cli group add-members idm_ui_enable_experimental_features theme_user "$admin" -D "$admin"
+cli group add-members idm_ui_enable_experimental_features "$admin" -D "$admin"
 
 cli system oauth2 create theme_demo "Theme Demo Application" https://example.com -D "$admin"
 cli system oauth2 update-scope-map theme_demo theme_apps openid -D "$admin"

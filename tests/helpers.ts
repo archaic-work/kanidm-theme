@@ -20,6 +20,7 @@ export async function capture(page: Page, info: TestInfo, name: string) {
     fullPage: true,
     animations: "disabled" as const,
     caret: "hide" as const,
+    maskColor: info.project.name.includes("dark") ? "#253348" : "#e5ebf3",
     mask: masks,
   };
   await page.evaluate(() => document.fonts.ready);

@@ -34,7 +34,9 @@ With Kanidm running locally and fixture credentials loaded:
 UPDATE_BASELINES=1 npx playwright test --update-snapshots
 ```
 
-Review and commit `tests/*-snapshots/*.png`. Future runs compare against those images. Set `STRICT_VISUAL_BASELINES=1` if you also want to fail tests missing a reference image. Update baselines deliberately after expected changes or version upgrades.
+Review and commit `tests/*-snapshots/*.png`. Future runs compare against those images.
+
+Alternatively, run **Actions → Propose visual baselines → Run workflow**. It generates the screenshots against the currently compatible Kanidm release and attempts to open a PR containing the reference images for review. GitHub Actions must have permission to create pull requests in the repository settings. After you merge reviewed baselines, the regular visual workflow automatically requires that all covered states have baselines. Set `STRICT_VISUAL_BASELINES=1` if you also want to fail tests missing a reference image. Update baselines deliberately after expected changes or version upgrades.
 
 ## Running locally
 

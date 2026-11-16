@@ -1,0 +1,83 @@
+name: Propose visual baselines
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  baselines:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve newest Kanidm adopted by released kaniop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash ci/resolve-version.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Playwright
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Start disposable Kanidm
+        run: bash ci/start.sh
+
+      - name: Seed disposable fixtures
+        run: bash ci/seed.sh
+
+      - name: Generate reference images
+        env:
+          UPDATE_BASELINES: "1"
+        run: npx playwright test --update-snapshots
+
+      - name: Build review gallery
+        if: always()
+        run: node ci/build-gallery.mjs
+
+      - name: Upload review gallery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kanidm-baseline-candidates-${{ github.run_id }}
+          path: |
+            index.html
+            manifest.json
+            screenshots/
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+      - name: Open review PR for changed baselines
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="visual-baselines/run-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add tests
+          if git diff --cached --quiet; then
+            echo "Baseline images are unchanged; no PR needed"
+            exit 0
+          fi
+          git commit -m "Update visual baselines (kaniop $KANIOP_RELEASE, Kanidm $KANIDM_VERSION)"
+          git push --set-upstream origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Review Kanidm $KANIDM_VERSION visual baselines" \
+            --body "Generated from kaniop $KANIOP_RELEASE with the disposable test environment. Review each screenshot before merging. Merge to activate or update visual regression checks."
+
+      - name: Remove disposable resources
+        if: always()
+        run: bash ci/stop.sh

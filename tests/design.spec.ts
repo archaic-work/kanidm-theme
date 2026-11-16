@@ -74,4 +74,9 @@ test("credentials has no stacked rules at the top", async ({ page }) => {
   }
   await expect(page.locator("#settings-window > hr")).toBeHidden();
   await expect(page.locator("#credentialUpdateStatusForm > hr.my-4").first()).toBeHidden();
+  // The credential template already has a final <hr> before the action bar;
+  // a second border at its top would produce a duplicate separator.
+  const barTopBorder = await page.locator("#cred-update-commit-bar")
+    .evaluate((element) => getComputedStyle(element).borderTopWidth);
+  expect(barTopBorder).toBe("0px");
 });

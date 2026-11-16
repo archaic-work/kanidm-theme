@@ -55,7 +55,7 @@ markup or supported product configuration rather than CSS alone.
 
 ## CI screenshots
 
-GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispatch. The workflow creates an isolated Kanidm container (with the actual `override.css` mounted), configures certificates, seeds synthetic identities and an OAuth2 app, and captures screenshots using three Chromium projects:
+GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispatch. The workflow creates an isolated Kanidm container (with the actual `override.css` mounted), configures certificates, seeds synthetic identities and an OAuth2 app, and captures screenshots using four Chromium projects:
 
 - Desktop (1440 × 900), light mode
 - Desktop (1440 × 900), dark mode

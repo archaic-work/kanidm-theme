@@ -56,3 +56,22 @@ test("account page has no horizontal document overflow", async ({ page }, info) 
   });
   expect(overflow, info.project.name + " should not overflow viewport").toBeLessThanOrEqual(2);
 });
+
+test("credentials has no stacked rules at the top", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/ui/update_credentials");
+
+  const visibleRules = await page.locator("#settings-window > hr, #credentialUpdateStatusForm > hr.my-4")
+    .evaluateAll((nodes) => nodes.filter((node) => {
+      const style = getComputedStyle(node);
+      const box = node.getBoundingClientRect();
+      return style.display !== "none" && style.visibility !== "hidden" && box.height > 0;
+    }).map((node) => Math.round(node.getBoundingClientRect().top)));
+
+  // Remaining rules separate credential subsections; they must not be stacked.
+  for (let i = 1; i < visibleRules.length; i++) {
+    expect(visibleRules[i] - visibleRules[i - 1]).toBeGreaterThan(32);
+  }
+  await expect(page.locator("#settings-window > hr")).toBeHidden();
+  await expect(page.locator("#credentialUpdateStatusForm > hr.my-4").first()).toBeHidden();
+});

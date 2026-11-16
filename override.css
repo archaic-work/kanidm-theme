@@ -767,6 +767,160 @@ hr {
   justify-content: flex-end !important;
 }
 
+/* Shared form-action alignment, scoped to real Kanidm templates.
+ * Submit and row actions end at their associated input/content column.
+ * Navigation/back and destructive actions retain their semantics.
+ */
+
+/* Login: username, password and TOTP have a full-width input above the CTA.
+ * Leave the mechanism-choice list alone: its buttons are choices, not submits
+ * for a visible input. The existing .form-signin rule overrides md centering,
+ * so the explicit alignment below wins for these forms at every viewport.
+ */
+.form-signin form#login:is(
+  [action="/ui/login/begin"],
+  [action="/ui/login/pw"],
+  [action="/ui/login/totp"]
+) > .input-group:has(> button[type="submit"]) {
+  justify-content: flex-end !important;
+}
+
+/* Profile Save / Unlock Edit: line up with the right edge of the
+ * editable value column (which is 8/12, 11/12 or 12/12 of the form).
+ * This applies to both editable and read-only user profiles.
+ */
+#settings-window form#user_settings_container > .pt-4 {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+#settings-window form#user_settings_container > .pt-4 > :is(button, a) {
+  margin-inline-start: auto;
+}
+
+@media (min-width: 48rem) {
+  #settings-window form#user_settings_container > .pt-4 {
+    width: 91.666667%;
+  }
+}
+
+@media (min-width: 62rem) {
+  #settings-window form#user_settings_container > .pt-4 {
+    width: 66.666667%;
+  }
+}
+
+/* Credentials: Add and remove actions should finish their subsection
+ * rather than float at its left edge. Explicit HX endpoints avoid changing
+ * any generic button styles or nearby navigation controls.
+ */
+#credentialUpdateStatusForm :is(
+  button[hx-post="/ui/reset/add_passkey"],
+  button[hx-post="/ui/reset/add_ssh_publickey"],
+  button[hx-post="/ui/reset/add_password"],
+  button[hx-post="/ui/reset/set_unixcred"],
+  button[hx-post="/ui/api/delete_alt_creds"]
+) {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-inline-start: auto;
+}
+
+/* Save / Discard are page-level actions. Preserve their grouping, but
+ * align the group to the same right edge as the credential sections.
+ */
+#cred-update-commit-bar {
+  width: 100%;
+  max-width: 100%;
+}
+
+#cred-update-commit-bar .toast-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+#cred-update-commit-bar .toast-body > .mt-3.d-flex {
+  margin-top: 0 !important;
+  margin-inline-start: auto;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* RADIUS: state description on the left, action on the right. Keep the
+ * whole field/action region to a readable measure, like profile fields.
+ */
+#radiusUpdateDynamicSection > div {
+  width: min(100%, 40rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 1rem;
+}
+
+#radiusUpdateDynamicSection > div > p {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+#radiusUpdateDynamicSection > div > p:has(> button) {
+  justify-self: end;
+}
+
+#radiusUpdateDynamicSection > div > p > button {
+  white-space: normal;
+}
+
+/* Admin group detail: Save/Unlock aligns with the editable value column.
+ * Create-member, create-group and create-person are already inline-end.
+ */
+#main > main.container-xxl form#user_settings_container > :is(
+  button[type="submit"],
+  a:has(> button)
+) {
+  display: block;
+  width: max-content;
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+}
+
+@media (min-width: 48rem) {
+  #main > main.container-xxl form#user_settings_container > :is(
+    button[type="submit"], a:has(> button)
+  ) { margin-inline-end: 8.333333%; }
+}
+
+@media (min-width: 62rem) {
+  #main > main.container-xxl form#user_settings_container > :is(
+    button[type="submit"], a:has(> button)
+  ) { margin-inline-end: 33.333333%; }
+}
+
+@media (max-width: 47.999rem) {
+  #cred-update-commit-bar .toast-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #cred-update-commit-bar .toast-body > .mt-3.d-flex {
+    justify-content: flex-end;
+  }
+
+  #radiusUpdateDynamicSection > div {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.65rem;
+  }
+
+  #radiusUpdateDynamicSection > div > p:has(> button) {
+    justify-self: end;
+  }
+}
+
 /* Preserve danger semantics for account deletion. Discarding an
  * uncommitted edit is a secondary action, not an account deletion.
  */

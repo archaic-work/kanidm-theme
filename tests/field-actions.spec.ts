@@ -121,3 +121,77 @@ test("credential reset submits at the token input's right edge, even at 320px", 
     await capture(page, info, width ? "credential-reset-submit-320" : "credential-reset-submit");
   }
 });
+
+test("login Begin and password Submit finish at the right edge of their inputs", async ({ page }, info) => {
+  await page.goto("/ui/login");
+  const username = page.locator("form#login #username");
+  const begin = page.locator('form#login[action="/ui/login/begin"] button[type="submit"]');
+  await expectActionRightAligned(username, begin);
+  await capture(page, info, "login-begin-action");
+
+  await page.locator("#username").fill("theme_user");
+  await begin.click();
+  const password = page.locator("form#login #password:visible");
+  await expect(password).toBeVisible();
+  const submit = page.locator('form#login[action="/ui/login/pw"] button[type="submit"]');
+  await expectActionRightAligned(password, submit);
+  await capture(page, info, "login-password-action");
+});
+
+test("profile Save follows the right edge of the email field", async ({ page }, info) => {
+  await signIn(page);
+  await page.goto("/ui/profile");
+  const email = page.locator('#user_settings_container .email-entry input[type="email"]').first();
+  const save = page.locator('#user_settings_container > .pt-4 button').first();
+  await expect(email).toBeVisible();
+  await expect(save).toBeVisible();
+  await expectActionRightAligned(email, save);
+  await capture(page, info, "profile-save-action");
+
+  await page.setViewportSize({ width: 320, height: 780 });
+  await expectActionRightAligned(email, save);
+});
+
+test("credential section actions and Save/Discard group align with their region", async ({ page }, info) => {
+  await signIn(page);
+  await page.goto("/ui/update_credentials");
+  const form = page.locator("#credentialUpdateStatusForm");
+  const passkey = form.locator('button[hx-post="/ui/reset/add_passkey"]').first();
+  const deleteGenerated = form.locator('button[hx-post="/ui/api/delete_alt_creds"]').first();
+  const save = form.getByRole("button", { name: "Save Changes" });
+  for (const action of [passkey, deleteGenerated, save]) {
+    await expect(action).toBeVisible();
+    await expectRightEdgesMatch(form, action, 4);
+  }
+  await capture(page, info, "credentials-action-edges");
+
+  await page.setViewportSize({ width: 320, height: 780 });
+  for (const action of [passkey, deleteGenerated, save]) {
+    await expectRightEdgesMatch(form, action, 4);
+  }
+});
+
+test("RADIUS generate action aligns at the region end", async ({ page }, info) => {
+  await signIn(page);
+  await page.goto("/ui/radius");
+  const row = page.locator("#radiusUpdateDynamicSection > div");
+  const action = row.getByRole("button", { name: /Generate RADIUS password/i });
+  await expect(action).toBeVisible();
+  await expectRightEdgesMatch(row, action, 4);
+  await capture(page, info, "radius-action-alignment");
+  await page.setViewportSize({ width: 320, height: 780 });
+  await expectRightEdgesMatch(row, action, 4);
+});
+
+async function expectRightEdgesMatch(region: Locator, action: Locator, tolerance = 3) {
+  const fieldBox = await bounds(region);
+  const actionBox = await bounds(action);
+  expect(Math.abs(fieldBox.right - actionBox.right)).toBeLessThanOrEqual(tolerance);
+}
+
+async function expectActionRightAligned(field: Locator, action: Locator) {
+  const fieldBox = await bounds(field);
+  const actionBox = await bounds(action);
+  expect(actionBox.top).toBeGreaterThanOrEqual(fieldBox.bottom - 2);
+  expect(Math.abs(fieldBox.right - actionBox.right)).toBeLessThanOrEqual(3);
+}

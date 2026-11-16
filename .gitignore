@@ -1,0 +1,8 @@
+node_modules/
+.local/
+screenshots/
+test-results/
+playwright-report/
+index.html
+manifest.json
+.DS_Store

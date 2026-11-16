@@ -1,0 +1,65 @@
+name: Kanidm visual checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve latest Kanidm adopted by released kaniop
+        id: versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash ci/resolve-version.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Playwright
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Start isolated Kanidm with override.css
+        run: bash ci/start.sh
+
+      - name: Seed deterministic fixture data
+        run: bash ci/seed.sh
+
+      - name: Capture screenshots and compare approved baselines
+        run: npx playwright test
+
+      - name: Build offline screenshot gallery
+        if: always()
+        run: node ci/build-gallery.mjs
+
+      - name: Upload screenshot gallery and visual diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kanidm-visuals-${{ github.run_id }}
+          path: |
+            index.html
+            manifest.json
+            screenshots/
+            playwright-report/
+            test-results/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Remove disposable resources
+        if: always()
+        run: bash ci/stop.sh

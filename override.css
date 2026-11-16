@@ -1,0 +1,140 @@
+/* kanidm-theme: minimal, accessible CSS-only starting point.
+   Mounted at /hpkg/override.css; the Kanidm UI loads this after style.css.
+   Avoid hiding or replacing security-sensitive controls with CSS. */
+
+:root,
+[data-bs-theme="light"] {
+  --bs-body-bg: #f6f8fb;
+  --bs-body-color: #152238;
+  --bs-secondary-color: #52617a;
+  --bs-tertiary-bg: #eef2f7;
+  --bs-border-color: #dbe2eb;
+  --bs-link-color: #2559b5;
+  --theme-surface: #ffffff;
+  --theme-accent: #295eb3;
+  --theme-accent-hover: #1e4a90;
+  --theme-shadow: 0 12px 36px rgb(17 31 54 / 8%);
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #111924;
+  --bs-body-color: #e8edf5;
+  --bs-secondary-color: #acb8c9;
+  --bs-tertiary-bg: #1c2837;
+  --bs-border-color: #334255;
+  --bs-link-color: #96b9ff;
+  --theme-surface: #1b2532;
+  --theme-accent: #729fed;
+  --theme-accent-hover: #93b7f7;
+  --theme-shadow: 0 12px 36px rgb(0 0 0 / 20%);
+}
+
+body {
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+nav.navbar {
+  background: var(--theme-surface) !important;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+nav .navbar-brand {
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.form-signin {
+  width: min(100% - 2rem, 430px);
+  max-width: 430px;
+  background: var(--theme-surface);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1.1rem;
+  box-shadow: var(--theme-shadow);
+  padding: clamp(1.4rem, 4vw, 2.4rem);
+}
+
+.form-signin > div,
+.form-signin > div > form {
+  width: 100%;
+}
+
+.form-signin .kanidm_logo {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  margin-bottom: 0.8rem;
+}
+
+.form-signin > h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-control,
+.form-select,
+.btn,
+.card,
+.list-group-item {
+  border-radius: 0.65rem;
+}
+
+.form-control,
+.form-select {
+  background-color: var(--theme-surface);
+  border-color: var(--bs-border-color);
+  min-height: 2.55rem;
+}
+
+.btn {
+  font-weight: 560;
+  min-height: 2.45rem;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--theme-accent);
+  --bs-btn-border-color: var(--theme-accent);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--theme-accent-hover);
+  --bs-btn-hover-border-color: var(--theme-accent-hover);
+  --bs-btn-active-bg: var(--theme-accent-hover);
+  --bs-btn-active-border-color: var(--theme-accent-hover);
+}
+
+.card {
+  background: var(--theme-surface);
+  border-color: var(--bs-border-color);
+  box-shadow: 0 3px 12px rgb(17 31 54 / 5%);
+}
+
+.side-menu-item.active {
+  color: var(--bs-body-color);
+  background: var(--bs-tertiary-bg);
+}
+
+#cred-update-commit-bar {
+  background: var(--theme-surface);
+}
+
+footer.footer {
+  background: var(--bs-body-bg) !important;
+}
+
+@media (max-width: 575px) {
+  .form-signin {
+    width: calc(100% - 1.2rem);
+    padding: 1.35rem;
+  }
+
+  .side-menu {
+    min-width: 0;
+  }
+}

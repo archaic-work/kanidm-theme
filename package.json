@@ -1,0 +1,15 @@
+{
+  "name": "kanidm-theme",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Kanidm CSS overrides and Playwright visual regression tests",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "gallery": "node ci/build-gallery.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "typescript": "5.9.3"
+  }
+}

@@ -37,6 +37,22 @@ the URL-encoded SVG data URI used by `--archaic-brand-mark`, and run
 `node ci/check-logo.mjs`. PR visual checks produce screenshots for both
 desktop color schemes and mobile.
 
+## Heritage v0.3 refinements
+
+The CSS-only Bootstrap adapter mirrors the canonical Archaic Heritage v0.3
+palette, spacing units, and type roles: sans headings and controls, serif
+explanations (including credential instructions nested inside forms), and
+monospace technical identifiers. Public authentication title rules follow the
+identity block instead of sitting above the logo. The mobile admin overview
+keeps its row-action column visible while scrolling wide data in its own
+container. Upstream markup and authentication interactions remain unchanged.
+
+Archaic normally uses Oat for first-party pages. Kanidm supplies Bootstrap,
+so these rules are adapted to that markup rather than importing Oat or
+forking Kanidm. Admin pages still use upstream breadcrumb headings and some
+browser/UI text remains upstream-branded; fixing semantics requires upstream
+markup or supported product configuration rather than CSS alone.
+
 ## CI screenshots
 
 GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispatch. The workflow creates an isolated Kanidm container (with the actual `override.css` mounted), configures certificates, seeds synthetic identities and an OAuth2 app, and captures screenshots using three Chromium projects:
@@ -44,12 +60,13 @@ GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispat
 - Desktop (1440 × 900), light mode
 - Desktop (1440 × 900), dark mode
 - Pixel 7, light mode
+- Pixel 7, dark mode
 
 Download the artifact named `kanidm-visuals-<run-id>` on the workflow run page. Extract it, open `index.html` for the gallery, or attach the ZIP to a ChatGPT conversation for visual review. The ZIP contains screenshots, `manifest.json`, the Playwright report, and any test diffs/traces.
 
 ### Visual regression baselines
 
-The initial runs capture screenshots **without approved baselines**. Only once you review and commit reference images will CI perform pixel comparisons.
+Visual baselines are **deliberately not approved yet** while the design is being refined. Every PR still captures light/dark desktop and mobile screenshots and runs functional/style assertions. Do not generate, commit, or propose baseline PNGs as part of a refinement PR. Once the visual design is approved, reference images may be proposed separately for review.
 
 With Kanidm running locally and fixture credentials loaded:
 

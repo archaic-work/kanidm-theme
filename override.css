@@ -1,7 +1,7 @@
 /*
  * Archaic Heritage for Kanidm (Bootstrap adapter, CSS-only).
  *
- * The palette below is the canonical Archaic Heritage v0.2 palette from
+ * The paired palette below mirrors the canonical Archaic Heritage v0.3 palette from
  * archaic-web-design/assets/archaic-theme.css. Kanidm serves just one
  * /hpkg/override.css file and uses Bootstrap, not Oat, so this file
  * translates those tokens without altering upstream markup or login flows.
@@ -26,6 +26,14 @@
   --archaic-success: light-dark(#376143, #88caa2);
   --archaic-warning: light-dark(#805a16, #e8c177);
   --archaic-on-status: light-dark(#f7f5ee, #171d1a);
+
+  /* Family spacing and native typography roles; the Kanidm adapter is CSS-only. */
+  --archaic-space-sm: .75rem;
+  --archaic-space-md: 1.5rem;
+  --archaic-space-lg: 2.5rem;
+  --archaic-space-xl: 4rem;
+  --font-sans: sans-serif;
+  --font-mono: monospace;
 }
 
 /*
@@ -71,7 +79,7 @@ button,
 input,
 select,
 textarea {
-  font-family: sans-serif;
+  font-family: var(--font-sans);
 }
 
 body {
@@ -82,10 +90,39 @@ body {
 
 :is(h1, h2, h3, h4, h5, h6) {
   color: var(--archaic-ink);
-  font-family: sans-serif;
-  font-weight: 600;
-  line-height: 1.15;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.2;
   letter-spacing: -0.015em;
+  text-align: start;
+}
+
+/* Structural UI is sans; explanatory prose is serif even within content. */
+#main :is(p, blockquote) {
+  font-family: serif;
+  line-height: 1.6;
+  text-align: start;
+}
+
+/* Operational paragraphs inside controls, tables and feedback remain sans. */
+#main :is(form, table, .breadcrumb, .list-group, .card, .alert, .toast) p {
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+
+/* Credential instructions are explanations, although Kanidm nests them in a form. */
+#main #credentialUpdateStatusForm p:not(:has(> button)) {
+  font-family: serif;
+  line-height: 1.6;
+}
+
+#main :is(code, pre, kbd, samp, .font-monospace) {
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+
+#main :is(p, li, dd) :is(code, kbd, samp) {
+  overflow-wrap: anywhere;
 }
 
 a,
@@ -100,8 +137,8 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--archaic-blue) !important;
-  outline-offset: 2px;
+  outline: 3px solid var(--archaic-blue) !important;
+  outline-offset: 3px;
 }
 
 ::selection {
@@ -119,8 +156,8 @@ nav.navbar {
 
   background: var(--archaic-paper) !important;
   border-bottom: 3px solid var(--archaic-ink);
-  padding-block: 1.15rem 0.9rem;
-  margin-bottom: 2.25rem !important;
+  padding-block: var(--archaic-space-lg) var(--archaic-space-md);
+  margin-bottom: var(--archaic-space-lg) !important;
 }
 
 nav.navbar .container-lg,
@@ -175,7 +212,7 @@ footer.footer a {
 
 #main > main,
 #main > .container-lg {
-  padding-bottom: 3rem;
+  padding-bottom: var(--archaic-space-xl);
 }
 
 #main :is(h2, h3, h4) {
@@ -195,11 +232,9 @@ hr {
 .form-signin {
   max-width: 34rem;
   width: min(calc(100% - 2.5rem), 34rem);
-  padding: 2.5rem 0 2rem;
+  padding: var(--archaic-space-lg) 0 var(--archaic-space-md);
   background: transparent;
   border: 0;
-  border-top: 3px solid var(--archaic-ink);
-  border-bottom: 0;
   border-radius: 0;
   box-shadow: none;
   align-items: stretch !important;
@@ -217,7 +252,9 @@ hr {
   align-self: stretch;
   font-size: clamp(1.55rem, 3vw, 1.95rem);
   font-weight: 500;
-  margin-bottom: 1.6rem;
+  padding-bottom: var(--archaic-space-md);
+  border-bottom: 3px solid var(--archaic-ink);
+  margin-bottom: var(--archaic-space-lg);
 }
 
 .form-signin > div,
@@ -499,7 +536,7 @@ hr {
 }
 
 #credentialUpdateStatusForm hr.my-4 {
-  margin-block: 1.35rem !important;
+  margin-block: var(--archaic-space-md) !important;
 }
 
 #settings-window .form-cred-reset-body strong,
@@ -512,7 +549,7 @@ hr {
 #settings-window > div > h2 {
   letter-spacing: -0.01em;
   font-weight: 500;
-  margin-bottom: 1.15rem;
+  margin-bottom: var(--archaic-space-md);
 }
 
 #credentialUpdateStatusForm h4 {
@@ -548,7 +585,9 @@ hr {
 #cred-reset-form center h3 {
   font-size: clamp(1.55rem, 3vw, 1.95rem);
   font-weight: 500;
-  margin-bottom: 1.75rem;
+  padding-bottom: var(--archaic-space-md);
+  border-bottom: 3px solid var(--archaic-ink);
+  margin-bottom: var(--archaic-space-lg);
 }
 
 /* The primary action submits the token input, so it belongs at the
@@ -640,6 +679,27 @@ hr {
 #main > main.container-xxl h4 {
   font-size: 1.2rem;
   font-weight: 500;
+}
+
+/* Upstream uses a breadcrumb instead of a page heading for admin lists.
+ * Give that existing page label the Heritage title hierarchy without
+ * inventing a heading element in CSS or changing its navigation semantics.
+ */
+#main > main.container-xxl #settings-window > nav[aria-label="breadcrumb"] {
+  border-bottom: 3px solid var(--archaic-ink);
+  padding-bottom: var(--archaic-space-md);
+  margin-bottom: var(--archaic-space-lg);
+}
+
+#main > main.container-xxl #settings-window > nav[aria-label="breadcrumb"] .breadcrumb {
+  margin-bottom: 0;
+}
+
+#main > main.container-xxl #settings-window > nav[aria-label="breadcrumb"] [aria-current="page"] {
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+  font-weight: 500;
+  color: var(--archaic-ink);
+  line-height: 1.2;
 }
 
 #main > main.container-xxl .table {
@@ -948,6 +1008,21 @@ hr {
 }
 
 #cred-update-commit-bar .btn-success {
+  /* Upstream uses btn-success for Save Changes; this is a primary action. */
+  --bs-btn-color: var(--archaic-on-blue);
+  --bs-btn-bg: var(--archaic-blue);
+  --bs-btn-border-color: var(--archaic-blue);
+  --bs-btn-hover-color: var(--archaic-paper);
+  --bs-btn-hover-bg: var(--archaic-ink);
+  --bs-btn-hover-border-color: var(--archaic-ink);
+  --bs-btn-disabled-color: var(--archaic-muted-ink);
+  --bs-btn-disabled-bg: var(--archaic-tint);
+  --bs-btn-disabled-border-color: var(--archaic-rule);
+  --bs-btn-disabled-opacity: 1;
+}
+
+/* Adding a password is not a warning. Reserve amber for actual warnings. */
+#credentialUpdateStatusForm button.btn-warning[hx-post="/ui/reset/add_password"] {
   --bs-btn-color: var(--archaic-on-blue);
   --bs-btn-bg: var(--archaic-blue);
   --bs-btn-border-color: var(--archaic-blue);
@@ -1017,7 +1092,7 @@ hr {
 
   #settings-window {
     padding-left: 0 !important;
-    padding-top: 1.25rem !important;
+    padding-top: var(--archaic-space-md) !important;
     overflow-x: auto;
   }
 
@@ -1037,9 +1112,28 @@ hr {
     justify-self: end;
   }
 
-  /* Long UUIDs and group names scroll inside their admin content area. */
+  /* Keep dense admin data horizontally scrollable, but do not strand the
+   * destructive row action off-screen. Native table semantics are preserved.
+   */
   #main > main.container-xxl #settings-window .table :is(th, td) {
     white-space: nowrap;
+  }
+
+  #main > main.container-xxl #settings-window .table:has(> tbody:is(#persons, #groups)) {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  #main > main.container-xxl #settings-window .table:has(> tbody:is(#persons, #groups)) :is(th, td):last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background: var(--archaic-paper);
+    border-inline-start: 1px solid var(--archaic-rule);
+  }
+
+  #main > main.container-xxl #settings-window .table:has(> tbody:is(#persons, #groups)) th:last-child {
+    z-index: 2;
   }
 
 }

@@ -54,7 +54,9 @@ explanations (including credential instructions nested inside forms), and
 monospace technical identifiers. Public authentication title rules follow the
 identity block instead of sitting above the logo. The mobile admin overview
 keeps its row-action column visible while scrolling wide data in its own
-container. Upstream markup and authentication interactions remain unchanged.
+container. Redundant upstream admin crab icons are hidden, while text labels
+remain. User/domain metadata stays sans; explanatory instructions use serif.
+Upstream markup and authentication interactions remain unchanged.
 
 Archaic normally uses Oat for first-party pages. Kanidm supplies Bootstrap,
 so these rules are adapted to that markup rather than importing Oat or

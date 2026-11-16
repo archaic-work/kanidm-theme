@@ -116,6 +116,12 @@ body {
   line-height: 1.6;
 }
 
+/* User and domain facts are operational metadata, not editorial prose. */
+#main .form-cred-reset-body > div:first-child > p {
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+
 #main :is(code, pre, kbd, samp, .font-monospace) {
   font-family: var(--font-mono);
   font-weight: 400;
@@ -671,9 +677,11 @@ hr {
 }
 
 /* Dense administration: let field and row content carry the emphasis. */
+/* Upstream's account/group icons resemble Kanidm's crab branding.
+ * The menu text already names each destination; keep the list understated.
+ */
 #main > main.container-xxl .list-group.side-menu img {
-  filter: grayscale(1);
-  opacity: 0.7;
+  display: none;
 }
 
 #main > main.container-xxl h4 {

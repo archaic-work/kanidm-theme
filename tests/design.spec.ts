@@ -151,7 +151,7 @@ test("Heritage type roles, title separator and primary Save semantics", async ({
   }));
   expect(typography.heading).toBe("500");
   expect(typography.headingFamily).toContain("sans-serif");
-  expect(typography.proseFamily).toContain("serif");
+  expect(typography.proseFamily).toContain("sans-serif");
   expect(typography.explanatoryFamily).toContain("serif");
   expect(typography.actionFamily).toContain("sans-serif");
 
@@ -181,6 +181,9 @@ test("admin overview row actions remain reachable at 320px", async ({ page }) =>
     ["/ui/admin/groups", "#groups"],
   ] as const) {
     await page.goto(route);
+    const menuIcons = page.locator("#main > main.container-xxl .list-group.side-menu img");
+    expect(await menuIcons.count()).toBeGreaterThan(0);
+    await expect(menuIcons.first()).toBeHidden();
     const table = page.locator(`#settings-window table:has(> tbody${rows})`);
     await expect(table).toBeVisible();
     await expect(table.locator("tbody tr button").first()).toBeVisible();

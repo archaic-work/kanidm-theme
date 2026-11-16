@@ -1,0 +1,90 @@
+# Kanidm Theme
+
+CSS-only theme for Kanidm plus reproducible Playwright screenshots and visual regression checks. No Kanidm or kaniop fork.
+
+## Version policy
+
+**Use the latest Kanidm version adopted by the latest stable release of [kaniop](https://github.com/pando85/kaniop).** `ci/resolve-version.sh` queries GitHub's latest released kaniop tag, reads that tag's `Cargo.toml`, and requires its `kanidm_client` and `kanidm_proto` versions to match. The selected version is used for `kanidm/server` and `kanidm/tools` alike.
+
+This intentionally does not follow Kanidm's `latest` image tag or unreleased kaniop commits. Currently kaniop `v0.23.0` selects Kanidm `1.12.1`.
+
+```bash
+bash ci/resolve-version.sh
+```
+
+If the manifest format changes or its versions disagree, the workflow fails rather than using an unverified release.
+
+## CI screenshots
+
+GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispatch. The workflow creates an isolated Kanidm container (with the actual `override.css` mounted), configures certificates, seeds synthetic identities and an OAuth2 app, and captures screenshots using three Chromium projects:
+
+- Desktop (1440 × 900), light mode
+- Desktop (1440 × 900), dark mode
+- Pixel 7, light mode
+
+Download the artifact named `kanidm-visuals-<run-id>` on the workflow run page. Extract it, open `index.html` for the gallery, or attach the ZIP to a ChatGPT conversation for visual review. The ZIP contains screenshots, `manifest.json`, the Playwright report, and any test diffs/traces.
+
+### Visual regression baselines
+
+The initial runs capture screenshots **without approved baselines**. Only once you review and commit reference images will CI perform pixel comparisons.
+
+With Kanidm running locally and fixture credentials loaded:
+
+```bash
+UPDATE_BASELINES=1 npx playwright test --update-snapshots
+```
+
+Review and commit `tests/*-snapshots/*.png`. Future runs compare against those images. Set `STRICT_VISUAL_BASELINES=1` if you also want to fail tests missing a reference image. Update baselines deliberately after expected changes or version upgrades.
+
+## Running locally
+
+Requires Docker, Node.js 22+, and Linux. No Kubernetes cluster or production credentials needed.
+
+```bash
+npm install
+npx playwright install chromium
+export KANIDM_VERSION="$(bash ci/resolve-version.sh | sed -n 's/.*kanidm\/server://p')"
+bash ci/start.sh
+bash ci/seed.sh
+source .local/credentials.env
+npx playwright test
+node ci/build-gallery.mjs
+bash ci/stop.sh
+```
+
+Open `index.html` to inspect the local gallery. The scripts assume that a disposable IdP is created on `localhost:8443` and will reset its test identities; never point them at production.
+
+## Current coverage
+
+Login (username, password), credential reset token entry, recovery/signup availability, populated app launcher, profile, credential settings, device enrolment, RADIUS settings, administrator persons and groups. Device-enrolment secrets/QR codes and random UUIDs are masked.
+
+The suite does **not** yet cover the entire Kanidm UI state space: TOTP, passkey and backup-code challenges, OAuth2 consent, device authorization, and interactive signup/recovery scenarios need dedicated stateful fixtures. These will be added incrementally rather than claiming false coverage from a URL crawl.
+
+## Deploy the CSS with kaniop
+
+Add to the existing `Kanidm.spec`:
+
+```yaml
+spec:
+  volumes:
+    - name: ui-theme
+      configMap:
+        name: kanidm-theme
+  volumeMounts:
+    - name: ui-theme
+      mountPath: /hpkg/override.css
+      subPath: override.css
+      readOnly: true
+```
+
+Create the ConfigMap with an `override.css` key. A rollout is needed after CSS changes because Kubernetes `subPath` mounts do not receive live ConfigMap updates.
+
+## Security
+
+Only synthetic CI accounts are used. Credentials are generated per run and masked in job logs. Do not publish traces or screenshots without checking for sensitive information; downloaded artifacts should remain with trusted collaborators. The generated container, database volume, and CLI token cache are removed at the end of a run.
+
+## References
+
+- [Kanidm container quickstart](https://github.com/kanidm/kanidm/blob/v1.12.1/book/src/evaluation_quickstart.md)
+- [Kanidm UI templates](https://github.com/kanidm/kanidm/tree/v1.12.1/server/core/templates)
+- [kaniop v0.23.0 dependency manifest](https://github.com/pando85/kaniop/blob/v0.23.0/Cargo.toml)

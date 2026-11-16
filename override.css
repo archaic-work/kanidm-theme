@@ -1,152 +1,508 @@
-/* kanidm-theme: minimal, accessible CSS-only starting point.
-   Mounted at /hpkg/override.css; the Kanidm UI loads this after style.css.
-   Avoid hiding or replacing security-sensitive controls with CSS. */
+/*
+ * Archaic Heritage for Kanidm (Bootstrap adapter, CSS-only).
+ *
+ * The palette below is the canonical Archaic Heritage v0.2 palette from
+ * archaic-web-design/assets/archaic-theme.css. Kanidm serves just one
+ * /hpkg/override.css file and uses Bootstrap, not Oat, so this file
+ * translates those tokens without altering upstream markup or login flows.
+ *
+ * Keep the paired tokens aligned with the canonical family stylesheet.
+ * No webfonts, JS, shadows, gradients or decorative rounded panels.
+ */
 
-:root,
-[data-bs-theme="light"] {
-  --bs-body-bg: #f6f8fb;
-  --bs-body-color: #152238;
-  --bs-secondary-color: #52617a;
-  --bs-tertiary-bg: #eef2f7;
-  --bs-border-color: #dbe2eb;
-  --bs-link-color: #2559b5;
-  --theme-surface: #ffffff;
-  --theme-accent: #295eb3;
-  --theme-accent-hover: #1e4a90;
-  --theme-shadow: 0 12px 36px rgb(17 31 54 / 8%);
+:root {
+  color-scheme: light dark;
+
+  --archaic-paper: light-dark(#f7f5ee, #171d1a);
+  --archaic-ink: light-dark(#242922, #ecede4);
+  --archaic-muted-ink: light-dark(#5d6259, #b2b9b1);
+  --archaic-blue: light-dark(#285b78, #93c5df);
+  --archaic-rule: light-dark(#b8bbb0, #4b5752);
+  --archaic-tint: light-dark(#edf0eb, #232b27);
+  --archaic-card: light-dark(#f7f5ee, #232b27);
+  --archaic-input-border: light-dark(#5d6259, #899b91);
+  --archaic-on-blue: light-dark(#f7f5ee, #13232b);
+  --archaic-error: light-dark(#963c2e, #f29b8f);
+  --archaic-success: light-dark(#376143, #88caa2);
+  --archaic-warning: light-dark(#805a16, #e8c177);
+  --archaic-on-status: light-dark(#f7f5ee, #171d1a);
 }
 
-[data-bs-theme="dark"] {
-  --bs-body-bg: #111924;
-  --bs-body-color: #e8edf5;
-  --bs-secondary-color: #acb8c9;
-  --bs-tertiary-bg: #1c2837;
-  --bs-border-color: #334255;
-  --bs-link-color: #96b9ff;
-  --theme-surface: #1b2532;
-  --theme-accent: #729fed;
-  --theme-accent-hover: #93b7f7;
-  --theme-shadow: 0 12px 36px rgb(0 0 0 / 20%);
+/*
+ * Kanidm's /pkg/style.js sets data-bs-theme based on the OS preference.
+ * Reuse that existing mechanism rather than adding a conflicting switch.
+ */
+:root[data-bs-theme="light"] { color-scheme: light; }
+:root[data-bs-theme="dark"] { color-scheme: dark; }
+
+/* Bootstrap-facing semantic bridge. */
+:root,
+:root[data-bs-theme="light"],
+:root[data-bs-theme="dark"] {
+  --bs-body-bg: var(--archaic-paper);
+  --bs-body-color: var(--archaic-ink);
+  --bs-body-font-family: sans-serif;
+  --bs-body-line-height: 1.55;
+  --bs-heading-color: var(--archaic-ink);
+  --bs-emphasis-color: var(--archaic-ink);
+  --bs-secondary-color: var(--archaic-muted-ink);
+  --bs-tertiary-color: var(--archaic-muted-ink);
+  --bs-secondary-bg: var(--archaic-tint);
+  --bs-tertiary-bg: var(--archaic-tint);
+  --bs-border-color: var(--archaic-rule);
+  --bs-border-color-translucent: var(--archaic-rule);
+  --bs-link-color: var(--archaic-blue);
+  --bs-link-hover-color: var(--archaic-blue);
+  --bs-code-color: var(--archaic-ink);
+  --bs-border-radius: 0;
+  --bs-border-radius-sm: 0;
+  --bs-border-radius-lg: 0;
+  --bs-border-radius-xl: 0;
+  --bs-border-radius-xxl: 0;
+  --bs-border-radius-pill: 0;
+  --bs-box-shadow: none;
+  --bs-box-shadow-sm: none;
+  --bs-box-shadow-lg: none;
+}
+
+/* Type, hierarchy and navigational language. */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: sans-serif;
 }
 
 body {
-  background: var(--bs-body-bg);
-  color: var(--bs-body-color);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--archaic-paper);
+  color: var(--archaic-ink);
   line-height: 1.55;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 650;
-  letter-spacing: -0.02em;
+:is(h1, h2, h3, h4, h5, h6) {
+  color: var(--archaic-ink);
+  font-family: sans-serif;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
 }
 
+a,
+a:visited {
+  color: var(--archaic-blue);
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--archaic-blue);
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--archaic-blue) !important;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--archaic-tint);
+  color: var(--archaic-ink);
+}
+
+/* Consistent masthead and restrained footer. */
 nav.navbar {
-  background: var(--theme-surface) !important;
-  border-bottom: 1px solid var(--bs-border-color);
+  --bs-navbar-color: var(--archaic-ink);
+  --bs-navbar-hover-color: var(--archaic-blue);
+  --bs-navbar-active-color: var(--archaic-ink);
+  --bs-navbar-brand-color: var(--archaic-ink);
+  --bs-navbar-brand-hover-color: var(--archaic-ink);
+
+  background: var(--archaic-paper) !important;
+  border-bottom: 3px solid var(--archaic-ink);
+  padding-block: 1.15rem 0.9rem;
+  margin-bottom: 2.25rem !important;
 }
 
-nav .navbar-brand {
-  font-weight: 650;
+nav.navbar .container-lg,
+#main > main.container-lg,
+#main > main.container-xxl {
+  max-width: 76rem;
+}
+
+nav.navbar .navbar-brand {
+  color: var(--archaic-ink);
+  font-weight: 600;
+  font-size: 1.2rem;
   letter-spacing: -0.025em;
+  text-decoration: none;
 }
 
+nav.navbar .nav-link {
+  color: var(--archaic-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--archaic-rule);
+  text-underline-offset: 0.25em;
+}
+
+nav.navbar .nav-link:hover {
+  color: var(--archaic-blue);
+  text-decoration-color: currentColor;
+}
+
+nav.navbar .navbar-toggler {
+  color: var(--archaic-ink);
+  background: transparent;
+  border: 1px solid var(--archaic-rule);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+nav.navbar .navbar-toggle-icon {
+  color: var(--archaic-ink);
+}
+
+footer.footer {
+  background: var(--archaic-paper) !important;
+  border-top: 1px solid var(--archaic-rule);
+  padding-block: 1.25rem 1.75rem !important;
+  font-size: 0.875rem;
+}
+
+footer.footer .text-muted,
+footer.footer a {
+  color: var(--archaic-muted-ink) !important;
+}
+
+#main > main,
+#main > .container-lg {
+  padding-bottom: 3rem;
+}
+
+#main :is(h2, h3, h4) {
+  font-weight: 600;
+}
+
+#main h2 {
+  font-size: clamp(1.85rem, 3vw, 2.6rem);
+}
+
+hr {
+  border-top-color: var(--archaic-rule);
+  opacity: 1;
+}
+
+/* Public authentication, recovery and signup: one editorial form, not a card. */
 .form-signin {
-  width: min(100% - 2rem, 430px);
-  max-width: 430px;
-  background: var(--theme-surface);
-  border: 1px solid var(--bs-border-color);
-  border-radius: 1.1rem;
-  box-shadow: var(--theme-shadow);
-  padding: clamp(1.4rem, 4vw, 2.4rem);
+  max-width: 34rem;
+  width: min(calc(100% - 2.5rem), 34rem);
+  padding: 2.5rem 0 2rem;
+  background: transparent;
+  border: 0;
+  border-top: 3px solid var(--archaic-ink);
+  border-bottom: 1px solid var(--archaic-rule);
+  border-radius: 0;
+  box-shadow: none;
+  align-items: stretch !important;
+}
+
+.form-signin .kanidm_logo {
+  align-self: flex-start;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  margin: 0 0 1.25rem;
+}
+
+.form-signin > h3 {
+  align-self: stretch;
+  font-size: clamp(1.65rem, 3vw, 2.1rem);
+  margin-bottom: 1.6rem;
 }
 
 .form-signin > div,
 .form-signin > div > form {
   width: 100%;
+  min-width: 0;
 }
 
-.form-signin .kanidm_logo {
-  width: 82px;
-  height: 82px;
-  object-fit: contain;
-  margin-bottom: 0.8rem;
+.form-signin .justify-content-md-center {
+  justify-content: flex-start !important;
 }
 
-.form-signin > h3 {
-  font-size: 1.3rem;
-  margin-bottom: 1.5rem;
+.form-signin .form-label {
+  font-weight: 600;
 }
 
+.form-signin .form-check {
+  margin-block: 1.15rem;
+}
+
+.form-signin .btn-primary[type="submit"] {
+  min-width: 8.75rem;
+}
+
+/* Native controls: square, well-defined, and keyboard visible. */
 .form-control,
 .form-select,
+.form-control-plaintext,
 .btn,
 .card,
-.list-group-item {
-  border-radius: 0.65rem;
+.list-group-item,
+.alert,
+.modal-content,
+.dropdown-menu,
+.toast {
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .form-control,
 .form-select {
-  background-color: var(--theme-surface);
-  border-color: var(--bs-border-color);
-  min-height: 2.55rem;
+  min-height: 2.65rem;
+  background: var(--archaic-paper);
+  color: var(--archaic-ink);
+  border: 1px solid var(--archaic-input-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: var(--archaic-paper);
+  color: var(--archaic-ink);
+  border-color: var(--archaic-blue);
+  box-shadow: none;
+}
+
+.form-control:read-only {
+  background: var(--archaic-tint);
+}
+
+.form-control-plaintext {
+  color: var(--archaic-ink);
+}
+
+.form-check-input {
+  background-color: var(--archaic-paper);
+  border-color: var(--archaic-input-border);
+}
+
+.form-check-input:checked {
+  background-color: var(--archaic-blue);
+  border-color: var(--archaic-blue);
+}
+
+.form-check-input:focus {
+  border-color: var(--archaic-blue);
+  box-shadow: none;
 }
 
 .btn {
-  font-weight: 560;
-  min-height: 2.45rem;
+  font-weight: 600;
+  min-height: 2.5rem;
 }
 
 .btn-primary {
-  --bs-btn-color: #fff;
-  --bs-btn-bg: var(--theme-accent);
-  --bs-btn-border-color: var(--theme-accent);
-  --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: var(--theme-accent-hover);
-  --bs-btn-hover-border-color: var(--theme-accent-hover);
-  --bs-btn-active-bg: var(--theme-accent-hover);
-  --bs-btn-active-border-color: var(--theme-accent-hover);
+  --bs-btn-color: var(--archaic-on-blue);
+  --bs-btn-bg: var(--archaic-blue);
+  --bs-btn-border-color: var(--archaic-blue);
+  --bs-btn-hover-color: var(--archaic-paper);
+  --bs-btn-hover-bg: var(--archaic-ink);
+  --bs-btn-hover-border-color: var(--archaic-ink);
+  --bs-btn-focus-shadow-rgb: 0, 0, 0;
+  --bs-btn-active-color: var(--archaic-paper);
+  --bs-btn-active-bg: var(--archaic-ink);
+  --bs-btn-active-border-color: var(--archaic-ink);
+  --bs-btn-disabled-color: var(--archaic-muted-ink);
+  --bs-btn-disabled-bg: var(--archaic-tint);
+  --bs-btn-disabled-border-color: var(--archaic-rule);
 }
 
-.card {
-  background: var(--theme-surface);
-  border-color: var(--bs-border-color);
-  box-shadow: 0 3px 12px rgb(17 31 54 / 5%);
+.btn-secondary,
+.btn-outline-secondary {
+  --bs-btn-color: var(--archaic-ink);
+  --bs-btn-bg: var(--archaic-tint);
+  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-hover-color: var(--archaic-on-blue);
+  --bs-btn-hover-bg: var(--archaic-blue);
+  --bs-btn-hover-border-color: var(--archaic-blue);
+  --bs-btn-active-color: var(--archaic-on-blue);
+  --bs-btn-active-bg: var(--archaic-blue);
+  --bs-btn-active-border-color: var(--archaic-blue);
+}
+
+.btn-danger,
+.btn-outline-danger {
+  --bs-btn-color: var(--archaic-on-status);
+  --bs-btn-bg: var(--archaic-error);
+  --bs-btn-border-color: var(--archaic-error);
+  --bs-btn-hover-color: var(--archaic-on-status);
+  --bs-btn-hover-bg: var(--archaic-error);
+  --bs-btn-hover-border-color: var(--archaic-error);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--archaic-error);
+  --bs-btn-bg: transparent;
+}
+
+.btn-success {
+  --bs-btn-color: var(--archaic-on-status);
+  --bs-btn-bg: var(--archaic-success);
+  --bs-btn-border-color: var(--archaic-success);
+}
+
+.btn-warning {
+  --bs-btn-color: var(--archaic-on-status);
+  --bs-btn-bg: var(--archaic-warning);
+  --bs-btn-border-color: var(--archaic-warning);
+}
+
+/* Profile and administrator navigation. */
+.side-menu {
+  min-width: 12rem;
+}
+
+.side-menu-item {
+  color: var(--archaic-blue) !important;
+  background: transparent !important;
+  border-inline-start: 3px solid transparent;
+  border-radius: 0 !important;
+  padding: 0.55rem 0.75rem;
+}
+
+.side-menu-item:hover {
+  color: var(--archaic-blue) !important;
+  background: var(--archaic-tint) !important;
+  text-decoration: underline;
 }
 
 .side-menu-item.active {
-  color: var(--bs-body-color);
-  background: var(--bs-tertiary-bg);
+  color: var(--archaic-ink) !important;
+  background: var(--archaic-tint) !important;
+  border-inline-start-color: var(--archaic-ink);
+  font-weight: 600;
+}
+
+.list-group.side-menu .list-group-item {
+  color: var(--archaic-blue);
+  background: transparent;
+  border: 0;
+  border-inline-start: 3px solid transparent;
+  padding: 0.65rem 0.85rem;
+}
+
+.list-group.side-menu .list-group-item:is(:hover, .active) {
+  background: var(--archaic-tint);
+  color: var(--archaic-ink);
+  border-inline-start-color: var(--archaic-ink);
+}
+
+#settings-window {
+  min-width: 0;
+}
+
+#settings-window > div > h2 {
+  margin-bottom: 0.85rem;
+}
+
+#settings-window > hr {
+  margin-top: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Content and tables: meaningful edges, no visual card stacks. */
+.card {
+  --bs-card-bg: var(--archaic-card);
+  --bs-card-color: var(--archaic-ink);
+  --bs-card-border-color: var(--archaic-rule);
+  background: var(--archaic-card);
+  border: 1px solid var(--archaic-rule);
+  border-top: 3px solid var(--archaic-ink);
+}
+
+.card:has(a:hover) {
+  border-top-color: var(--archaic-blue);
+}
+
+.card > a {
+  height: 7.5rem;
+}
+
+.table {
+  --bs-table-color: var(--archaic-ink);
+  --bs-table-bg: transparent;
+  --bs-table-striped-color: var(--archaic-ink);
+  --bs-table-striped-bg: var(--archaic-tint);
+  --bs-table-border-color: var(--archaic-rule);
+}
+
+.table thead {
+  border-bottom: 3px solid var(--archaic-ink);
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: var(--archaic-rule);
+}
+
+.list-group-item {
+  background: var(--archaic-paper);
+  color: var(--archaic-ink);
+  border-color: var(--archaic-rule);
+}
+
+.breadcrumb {
+  --bs-breadcrumb-divider-color: var(--archaic-muted-ink);
 }
 
 #cred-update-commit-bar {
-  background: var(--theme-surface);
+  background: var(--archaic-paper);
+  border-top: 1px solid var(--archaic-rule);
 }
 
-footer.footer {
-  background: var(--bs-body-bg) !important;
+.alert {
+  color: var(--archaic-ink);
+  background: var(--archaic-tint);
+  border: 1px solid var(--archaic-rule);
+  border-left: 3px solid var(--archaic-blue);
 }
 
-[data-bs-theme="dark"] .btn-primary {
-  --bs-btn-color: #101b2c;
-  --bs-btn-hover-color: #101b2c;
-  --bs-btn-active-color: #101b2c;
+.alert-danger {
+  border-left-color: var(--archaic-error);
 }
 
-@media (max-width: 575px) {
-  .form-signin {
-    width: calc(100% - 1.2rem);
-    padding: 1.35rem;
+.alert-warning {
+  border-left-color: var(--archaic-warning);
+}
+
+.alert-success {
+  border-left-color: var(--archaic-success);
+}
+
+/* Mobile: compact scrollable navigation, independent content region. */
+@media (max-width: 47.999rem) {
+  nav.navbar {
+    padding-block: 0.75rem;
+    margin-bottom: 1.4rem !important;
   }
 
-  /* Kanidm's mobile profile sidebar is tall; make it compact and scrollable. */
-  .side-menu {
+  nav.navbar .navbar-brand {
+    font-size: 1rem;
+  }
+
+  nav.navbar .navbar-toggler-img {
+    max-height: 2rem;
+  }
+
+  #main main > .d-flex.flex-sm-row {
+    flex-direction: column !important;
+  }
+
+  .side-menu,
+  .list-group.side-menu {
     min-width: 0;
     max-width: 100%;
     flex-direction: row !important;
     flex-wrap: nowrap;
-    column-gap: 0.35rem;
+    gap: 0.25rem;
     overflow-x: auto;
     scrollbar-width: thin;
     padding-block: 0.35rem;
@@ -156,10 +512,19 @@ footer.footer {
     flex: 0 0 auto;
   }
 
-  .side-menu-item {
+  .side-menu-item,
+  .list-group.side-menu .list-group-item {
     white-space: nowrap;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+    border-inline-start: 0;
+    border-bottom: 3px solid transparent;
+  }
+
+  .side-menu-item.active,
+  .list-group.side-menu .list-group-item.active {
+    border-inline-start: 0;
+    border-bottom-color: var(--archaic-ink);
   }
 
   .side-menu-item .icon-container {
@@ -167,14 +532,33 @@ footer.footer {
   }
 
   #settings-window {
-    padding-top: 1.1rem !important;
+    padding-left: 0 !important;
+    padding-top: 1.25rem !important;
+    overflow-x: auto;
+  }
+
+  #main > main.container-lg,
+  #main > main.container-xxl {
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 22rem) {
+  .form-signin {
+    width: calc(100% - 2rem);
+    padding-block: 1.7rem;
   }
 
   nav.navbar .navbar-brand {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
+}
 
-  nav.navbar img.navbar-toggler-img {
-    height: 30px;
+/* Respect Kanidm's auth interactions and reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .form-control,
+  nav.navbar a {
+    transition: none;
   }
 }

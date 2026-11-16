@@ -26,6 +26,15 @@ authenticated navigation pages. It also removes the **Powered by Kanidm**
 footer. Domain display names and navigation text are retained so that users
 still know which identity domain they are using.
 
+Kanidm defaults its display name to `Kanidm <hostname>`. The disposable CI
+fixture explicitly sets it to `archaic.work` with the supported
+`kanidm system domain set-displayname "archaic.work" -D <admin-account>`
+command; it does **not** rename the domain, change the origin, or affect
+production. An administrator can apply the same display-name choice to the
+production Kanidm domain separately, after considering its use in OAuth and
+TOTP issuer labels. The browser title suffix and some internal UI text still
+come from upstream templates.
+
 **CSS-only limitation:** Kanidm's HTML templates still provide browser tab
 titles (including `- Kanidm`), favicon links, and some internal wording (such
 as `Kanidm domain:`). CSS cannot safely rewrite those, so full removal of the

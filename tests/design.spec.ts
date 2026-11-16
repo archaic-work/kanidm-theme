@@ -87,6 +87,7 @@ test("Bouncer branding follows heading colors and hides the upstream footer", as
     : "rgb(36, 41, 34)";
 
   await page.goto("/ui/login");
+  await expect(page.locator("#main.form-signin > h3")).toHaveText("archaic.work");
   await expect(page.locator("#main.form-signin > img.kanidm_logo")).toBeHidden();
   await expect(page.locator("footer.footer")).toBeHidden();
 

@@ -39,6 +39,10 @@ admin_password="$(recover_password idm_admin)"
 admin="idm_admin@localhost"
 cli login -D "$admin" --password "$admin_password"
 
+# Match the site identity shown in the screenshots. This changes only the
+# disposable domain's display name, not its DNS name or authentication origin.
+cli system domain set-displayname "archaic.work" -D "$admin"
+
 cli group create theme_apps -D "$admin"
 cli person create theme_user "Theme Demo User" -D "$admin"
 cli person update theme_user --mail theme.user@example.test -D "$admin"

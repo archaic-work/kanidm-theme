@@ -653,6 +653,112 @@ hr {
   --bs-btn-active-bg: var(--archaic-error);
 }
 
+/* Inline field actions: a control's action belongs at its inline-end.
+ * Match Kanidm's actual HTMX form routes, not every Bootstrap input-group:
+ * generic form submits and section-level Save/Discard must stay unaffected.
+ */
+#main main.container-xxl :is(
+  form[hx-post="/ui/api/admin/person/create"],
+  form[hx-post="/ui/api/admin/group/create"],
+  form[hx-post$="/add_member"]
+) .input-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+#main main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) max-content;
+}
+
+#main main.container-xxl :is(
+  form[hx-post="/ui/api/admin/person/create"],
+  form[hx-post="/ui/api/admin/group/create"],
+  form[hx-post$="/add_member"]
+) .input-group > .form-control {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  flex: none;
+}
+
+#main main.container-xxl :is(
+  form[hx-post="/ui/api/admin/person/create"],
+  form[hx-post="/ui/api/admin/group/create"],
+  form[hx-post$="/add_member"]
+) .input-group > .btn {
+  width: auto;
+  min-width: max-content;
+  margin: 0;
+  align-self: stretch;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+/* Profile email editing: radio + email field + Remove share one row.
+ * On very narrow phones only the row action drops below the email input.
+ */
+#user_settings_container .email-entry > .input-group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+#user_settings_container .email-entry > .input-group:has(> .kanidm-remove-list-entry) {
+  grid-template-columns: auto minmax(0, 1fr) max-content;
+}
+
+#user_settings_container .email-entry > .input-group > .input-group-text {
+  margin: 0;
+  border: 1px solid var(--archaic-rule);
+  background: var(--archaic-tint);
+}
+
+#user_settings_container .email-entry > .input-group > .form-control {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  flex: none;
+}
+
+#user_settings_container .email-entry > .input-group > .kanidm-remove-list-entry {
+  margin: 0;
+  justify-self: end;
+  align-self: stretch;
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+/* A credential-row Remove button stays with the associated value.
+ * This also prevents long labels from pushing row actions off screen.
+ */
+#credentialUpdateStatusForm .list-group-item .d-flex.justify-content-between {
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+#credentialUpdateStatusForm .list-group-item .d-flex.justify-content-between > :is(button, div:has(> button)) {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+#credentialUpdateStatusForm .list-group-item .d-flex.justify-content-between > :first-child:not(button) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Credential edit forms already have separate Cancel/Submit rows.
+ * Anchor those rows to their input column, without moving Save Changes.
+ */
+#credentialUpdateDynamicSection :is(#newPasswordForm, #newTotpForm form) + .d-flex.justify-content-end {
+  width: 100%;
+  justify-content: flex-end !important;
+}
+
 /* Preserve danger semantics for account deletion. Discarding an
  * uncommitted edit is a secondary action, not an account deletion.
  */
@@ -756,23 +862,15 @@ hr {
     padding-inline: 1rem;
   }
 
-  /* Keep the person creation form usable on a phone. */
-  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.65rem;
+  /* Three person fields cannot fit side by side on phones. The
+   * button drops below both inputs, but stays at their right edge.
+   */
+  #main main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group > input {
-    width: 100%;
-    min-width: 0;
-    border-radius: 0;
-  }
-
-  #main > main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group > button {
-    align-self: flex-start;
-    width: auto;
-    border-radius: 0;
+  #main main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group > .btn {
+    justify-self: end;
   }
 
   /* Long UUIDs and group names scroll inside their admin content area. */
@@ -780,6 +878,35 @@ hr {
     white-space: nowrap;
   }
 
+}
+
+/* At 360px and below even single-input action rows should stack.
+ * Right-alignment is preserved rather than reverting to a left float.
+ */
+@media (max-width: 22.5rem) {
+  #main main.container-xxl :is(
+    form[hx-post="/ui/api/admin/group/create"],
+    form[hx-post$="/add_member"]
+  ) .input-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #main main.container-xxl :is(
+    form[hx-post="/ui/api/admin/group/create"],
+    form[hx-post$="/add_member"]
+  ) .input-group > .btn {
+    justify-self: end;
+  }
+
+  #user_settings_container .email-entry > .input-group:has(> .kanidm-remove-list-entry) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  #user_settings_container .email-entry > .input-group > .kanidm-remove-list-entry {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
 }
 
 @media (max-width: 22rem) {

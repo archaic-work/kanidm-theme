@@ -28,6 +28,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Verify embedded Bouncer logo matches its source SVG
+        run: node ci/check-logo.mjs
+
       - name: Install Playwright
         run: |
           npm install --no-audit --no-fund

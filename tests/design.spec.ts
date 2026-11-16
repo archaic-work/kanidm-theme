@@ -80,3 +80,43 @@ test("credentials has no stacked rules at the top", async ({ page }) => {
     .evaluate((element) => getComputedStyle(element).borderTopWidth);
   expect(barTopBorder).toBe("0px");
 });
+
+test("Bouncer branding follows heading colors and hides the upstream footer", async ({ page }) => {
+  const headingColor = test.info().project.name.includes("dark")
+    ? "rgb(236, 237, 228)"
+    : "rgb(36, 41, 34)";
+
+  await page.goto("/ui/login");
+  await expect(page.locator("#main.form-signin > img.kanidm_logo")).toBeHidden();
+  await expect(page.locator("footer.footer")).toBeHidden();
+
+  const loginMark = await page.locator("#main.form-signin").evaluate((el) => {
+    const style = getComputedStyle(el, "::before");
+    return {
+      content: style.content,
+      color: style.backgroundColor,
+      mask: style.maskImage,
+      width: style.width,
+    };
+  });
+  expect(loginMark.content).toBe('""');
+  expect(loginMark.color).toBe(headingColor);
+  expect(loginMark.mask).toContain("data:image/svg+xml");
+  expect(loginMark.width).toBe("56px");
+
+  await page.goto("/ui/reset");
+  await expect(page.locator("#cred-reset-form center > img.kanidm_logo")).toBeHidden();
+  const resetColor = await page.locator("#cred-reset-form center").evaluate(
+    (el) => getComputedStyle(el, "::before").backgroundColor,
+  );
+  expect(resetColor).toBe(headingColor);
+
+  await signIn(page);
+  await expect(page.locator("nav.navbar a.navbar-brand > img.navbar-toggler-img")).toBeHidden();
+  const navMark = await page.locator("nav.navbar a.navbar-brand").evaluate((el) => {
+    const style = getComputedStyle(el, "::before");
+    return { color: style.backgroundColor, mask: style.maskImage };
+  });
+  expect(navMark.color).toBe(headingColor);
+  expect(navMark.mask).toContain("data:image/svg+xml");
+});

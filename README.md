@@ -14,6 +14,29 @@ bash ci/resolve-version.sh
 
 If the manifest format changes or its versions disagree, the workflow fails rather than using an unverified release.
 
+## Bouncer branding
+
+The visible identity uses the Bouncer mark supplied for this theme. Its
+transparent silhouette is traced in `assets/bouncer-mask.svg` and embedded as
+an SVG data URI in `override.css`, since the deployed Kanidm server mounts only
+that CSS file. The mask uses `--bs-heading-color` for both light and dark modes.
+
+The theme replaces the logos on login, recovery, signup, credential-reset, and
+authenticated navigation pages. It also removes the **Powered by Kanidm**
+footer. Domain display names and navigation text are retained so that users
+still know which identity domain they are using.
+
+**CSS-only limitation:** Kanidm's HTML templates still provide browser tab
+titles (including `- Kanidm`), favicon links, and some internal wording (such
+as `Kanidm domain:`). CSS cannot safely rewrite those, so full removal of the
+upstream product name needs separately supported server-side/template
+configuration, not a misleading visual text substitution.
+
+To change the logo in the future, update `assets/bouncer-mask.svg`, regenerate
+the URL-encoded SVG data URI used by `--archaic-brand-mark`, and run
+`node ci/check-logo.mjs`. PR visual checks produce screenshots for both
+desktop color schemes and mobile.
+
 ## CI screenshots
 
 GitHub Actions runs on push, pull request, Monday morning UTC, and manual dispatch. The workflow creates an isolated Kanidm container (with the actual `override.css` mounted), configures certificates, seeds synthetic identities and an OAuth2 app, and captures screenshots using three Chromium projects:

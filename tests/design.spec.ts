@@ -49,38 +49,49 @@ test("login fields and buttons retain a visible keyboard focus indicator", async
   }
   await expect(username).toBeFocused();
   await expect(username).toBeEditable();
-  const field = await username.evaluate(el => {
-    const style = getComputedStyle(el);
-    return { outline: style.outlineStyle, border: style.borderColor, shadow: style.boxShadow };
-  });
-  expect(field.outline).toBe("none");
-  expect(field.border).toBe(blue);
-  expect(field.shadow).toContain(blue);
+  // Bootstrap transitions the border; retry until the final focus style settles.
+  await expect(username).toHaveCSS("outline-style", "none");
+  await expect(username).toHaveCSS("border-color", blue);
+  await expect(username).toHaveCSS("box-shadow", blue + " 0px 0px 0px 1px");
   await username.fill("theme_user");
   for (let i = 0; i < 20; i++) {
     await page.keyboard.press("Tab");
     if (await begin.evaluate(el => document.activeElement === el)) break;
   }
   await expect(begin).toBeFocused();
-  const button = await begin.evaluate(el => {
-    const style = getComputedStyle(el);
-    return { outline: style.outlineStyle, color: style.outlineColor, width: style.outlineWidth };
-  });
-  expect(button.outline).toBe("solid");
-  expect(button.color).toBe(blue);
-  expect(parseFloat(button.width)).toBeGreaterThanOrEqual(2);
+  await expect(begin).toHaveCSS("outline-style", "solid");
+  await expect(begin).toHaveCSS("outline-color", blue);
+  await expect(begin).toHaveCSS("outline-width", "2px");
 });
 
 test("explicit Heritage theme overrides system and restores it when removed", async ({ page }) => {
   await page.goto("/ui/login");
   const osDark = test.info().project.name.includes("dark");
+  const username = page.locator("#username");
+  const body = page.locator("body");
+  const paper = (dark: boolean) => dark ? "rgb(0, 0, 0)" : "rgb(247, 245, 238)";
+  const border = (dark: boolean) => dark ? "rgb(137, 155, 145)" : "rgb(93, 98, 89)";
+  const blue = (dark: boolean) => dark ? "rgb(147, 197, 223)" : "rgb(40, 91, 120)";
+
+  // Kanidm autofocuses the username on load. Check both control states
+  // deliberately, rather than expecting the idle border on a focused field.
   for (const host of ["html", "body"]) {
     const target = page.locator(host);
+    await username.blur();
+    await expect(username).not.toBeFocused();
+    await expect(username).toHaveCSS("border-color", border(osDark));
     await target.evaluate((el, mode) => el.setAttribute("data-theme", mode), osDark ? "light" : "dark");
-    await expect(page.locator("body")).toHaveCSS("background-color", osDark ? "rgb(247, 245, 238)" : "rgb(0, 0, 0)");
-    await expect(page.locator("#username")).toHaveCSS("border-color", osDark ? "rgb(93, 98, 89)" : "rgb(137, 155, 145)");
+    await expect(body).toHaveCSS("background-color", paper(!osDark));
+    await expect(body).toHaveCSS("color-scheme", osDark ? "light" : "dark");
+    await expect(username).toHaveCSS("border-color", border(!osDark));
+    await username.focus();
+    await expect(username).toBeFocused();
+    await expect(username).toHaveCSS("border-color", blue(!osDark));
     await target.evaluate(el => el.removeAttribute("data-theme"));
-    await expect(page.locator("body")).toHaveCSS("background-color", osDark ? "rgb(0, 0, 0)" : "rgb(247, 245, 238)");
+    await expect(body).toHaveCSS("background-color", paper(osDark));
+    await expect(username).toHaveCSS("border-color", blue(osDark));
+    await username.blur();
+    await expect(username).toHaveCSS("border-color", border(osDark));
   }
 });
 

@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { signIn } from "./helpers";
+import { execFileSync } from "node:child_process";
+
+test("deployed tokens match canonical Heritage source", () => {
+  execFileSync(process.execPath, ["ci/sync-theme.mjs", "--check"]);
+});
 
 /* Fast invariant checks, independent of screenshot baseline approval. */
 test("Heritage palette, typography, and square controls", async ({ page }) => {
@@ -19,7 +24,7 @@ test("Heritage palette, typography, and square controls", async ({ page }) => {
     };
   });
   const expectedBackground = test.info().project.name.includes("dark")
-    ? "rgb(23, 29, 26)"
+    ? "rgb(0, 0, 0)"
     : "rgb(247, 245, 238)";
   const expectedForeground = test.info().project.name.includes("dark")
     ? "rgb(236, 237, 228)"
@@ -28,23 +33,87 @@ test("Heritage palette, typography, and square controls", async ({ page }) => {
   expect(theme.foreground).toBe(expectedForeground);
   expect(theme.radius).toBe("0px");
   expect(theme.buttonRadius).toBe("0px");
-  expect(theme.font).toMatch(/sans-serif/i);
+  expect(theme.font).toBe("sans-serif");
   expect(theme.theme).toBe(test.info().project.name.includes("dark") ? "dark" : "light");
 });
 
-test("login remains keyboard accessible", async ({ page }) => {
+test("login fields and buttons retain a visible keyboard focus indicator", async ({ page }) => {
   await page.goto("/ui/login");
-  await page.locator("#username").focus();
-  const outline = await page.locator("#username").evaluate((el) => {
-    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
-    return getComputedStyle(el).outlineStyle;
-  });
-  // Browser focus-visible heuristics differ for scripted focus, but controls
-  // must always retain their visible native focus border.
-  expect(["solid", "auto", "none"]).toContain(outline);
-  const input = page.locator("#username");
-  await expect(input).toBeVisible();
-  await expect(input).toBeEditable();
+  const username = page.locator("#username");
+  const begin = page.getByRole("button", { name: /^Begin$/ });
+  const blue = test.info().project.name.includes("dark") ? "rgb(147, 197, 223)" : "rgb(40, 91, 120)";
+  // Traverse with real keyboard events, not scripted focus.
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press("Tab");
+    if (await username.evaluate(el => document.activeElement === el)) break;
+  }
+  await expect(username).toBeFocused();
+  await expect(username).toBeEditable();
+  // Bootstrap transitions the border; retry until the final focus style settles.
+  await expect(username).toHaveCSS("outline-style", "none");
+  await expect(username).toHaveCSS("border-color", blue);
+  await expect(username).toHaveCSS("box-shadow", blue + " 0px 0px 0px 1px");
+  await username.fill("theme_user");
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press("Tab");
+    if (await begin.evaluate(el => document.activeElement === el)) break;
+  }
+  await expect(begin).toBeFocused();
+  await expect(begin).toHaveCSS("outline-style", "solid");
+  await expect(begin).toHaveCSS("outline-color", blue);
+  await expect(begin).toHaveCSS("outline-width", "2px");
+});
+
+test("explicit Heritage theme overrides system and restores it when removed", async ({ page }) => {
+  await page.goto("/ui/login");
+  const osDark = test.info().project.name.includes("dark");
+  const username = page.locator("#username");
+  const body = page.locator("body");
+  const paper = (dark: boolean) => dark ? "rgb(0, 0, 0)" : "rgb(247, 245, 238)";
+  const border = (dark: boolean) => dark ? "rgb(137, 155, 145)" : "rgb(93, 98, 89)";
+  const blue = (dark: boolean) => dark ? "rgb(147, 197, 223)" : "rgb(40, 91, 120)";
+
+  // Kanidm autofocuses the username on load. Check both control states
+  // deliberately, rather than expecting the idle border on a focused field.
+  for (const host of ["html", "body"]) {
+    const target = page.locator(host);
+    await username.blur();
+    await expect(username).not.toBeFocused();
+    await expect(username).toHaveCSS("border-color", border(osDark));
+    await target.evaluate((el, mode) => el.setAttribute("data-theme", mode), osDark ? "light" : "dark");
+    await expect(body).toHaveCSS("background-color", paper(!osDark));
+    await expect(body).toHaveCSS("color-scheme", osDark ? "light" : "dark");
+    await expect(username).toHaveCSS("border-color", border(!osDark));
+    await username.focus();
+    await expect(username).toBeFocused();
+    await expect(username).toHaveCSS("border-color", blue(!osDark));
+    await target.evaluate(el => el.removeAttribute("data-theme"));
+    await expect(body).toHaveCSS("background-color", paper(osDark));
+    await expect(username).toHaveCSS("border-color", blue(osDark));
+    await username.blur();
+    await expect(username).toHaveCSS("border-color", border(osDark));
+  }
+});
+
+test("login fits at 200% root text size", async ({ page }) => {
+  await page.goto("/ui/login");
+  // Text-size simulation, not a claim of native browser zoom coverage.
+  await page.locator("html").evaluate(el => el.style.fontSize = "200%");
+  await expect(page.locator("#username")).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Begin$/ })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(2);
+});
+
+test("application directory uses unboxed rows with one separator", async ({ page }) => {
+  await signIn(page);
+  const directory = page.locator("#main > main.container-lg > .row:has(.oauth2-img)");
+  await expect(directory).toHaveCSS("flex-direction", "column");
+  const row = directory.locator(".card:has(.oauth2-img)").first();
+  await expect(row).toBeVisible();
+  await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(row).toHaveCSS("border-top-width", "0px");
+  await expect(row).toHaveCSS("border-bottom-width", "1px");
+  await expect(page.getByText("Theme Demo Application")).toBeVisible();
 });
 
 test("account page has no horizontal document overflow", async ({ page }, info) => {
@@ -125,7 +194,7 @@ test("Bouncer branding follows heading colors and hides the upstream footer", as
 test("Heritage type roles, title separator and primary Save semantics", async ({ page }) => {
   const dark = test.info().project.name.includes("dark");
   const primaryColor = dark ? "rgb(147, 197, 223)" : "rgb(40, 91, 120)";
-  const disabledColor = dark ? "rgb(35, 43, 39)" : "rgb(237, 240, 235)";
+  const disabledColor = dark ? "rgb(16, 21, 18)" : "rgb(237, 240, 235)";
 
   await page.goto("/ui/login");
   const loginRule = await page.locator("#main.form-signin").evaluate((el) => ({
@@ -150,10 +219,10 @@ test("Heritage type roles, title separator and primary Save semantics", async ({
     actionFamily: getComputedStyle(document.querySelector("#cred-update-commit-bar button")!).fontFamily,
   }));
   expect(typography.heading).toBe("500");
-  expect(typography.headingFamily).toContain("sans-serif");
-  expect(typography.proseFamily).toContain("sans-serif");
-  expect(typography.explanatoryFamily).toContain("serif");
-  expect(typography.actionFamily).toContain("sans-serif");
+  expect(typography.headingFamily).toBe("sans-serif");
+  expect(typography.proseFamily).toBe("sans-serif");
+  expect(typography.explanatoryFamily).toBe("sans-serif");
+  expect(typography.actionFamily).toBe("sans-serif");
 
   // Kanidm names this action btn-success, but its role is primary rather than
   // successful status. Check both enabled and disabled theme tokens.

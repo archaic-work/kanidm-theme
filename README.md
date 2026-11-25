@@ -46,23 +46,40 @@ the URL-encoded SVG data URI used by `--archaic-brand-mark`, and run
 `node ci/check-logo.mjs`. PR visual checks produce screenshots for both
 desktop color schemes and mobile.
 
-## Heritage v0.3 refinements
+## Heritage v0.4 refinements
 
-The CSS-only Bootstrap adapter mirrors the canonical Archaic Heritage v0.3
-palette, spacing units, and type roles: sans headings and controls, serif
-explanations (including credential instructions nested inside forms), and
-monospace technical identifiers. Public authentication title rules follow the
-identity block instead of sitting above the logo. The mobile admin overview
-keeps its row-action column visible while scrolling wide data in its own
-container. Redundant upstream admin crab icons are hidden, while text labels
-remain. User/domain metadata stays sans; explanatory instructions use serif.
-Upstream markup and authentication interactions remain unchanged.
+The CSS-only Bootstrap adapter uses the canonical Archaic Heritage v0.4
+palette: OLED black in dark mode, green-tinted functional surfaces, warm
+paper in light mode, and restrained blue actions. Sans-serif is used for
+all explanatory and operational text, including credential instructions;
+technical identifiers remain monospace. Application links form a compact
+single-column directory rather than a card grid. The existing Bouncer mark,
+field-action alignment, and scrollable admin tables are preserved.
 
-Archaic normally uses Oat for first-party pages. Kanidm supplies Bootstrap,
-so these rules are adapted to that markup rather than importing Oat or
-forking Kanidm. Admin pages still use upstream breadcrumb headings and some
-browser/UI text remains upstream-branded; fixing semantics requires upstream
-markup or supported product configuration rather than CSS alone.
+`assets/archaic-theme.css` is the unmodified canonical stylesheet from the
+Archaic Web Design skill (Heritage v0.4). Update that source when the skill
+changes, then regenerate the token block in the deployable CSS:
+
+```bash
+node ci/sync-theme.mjs
+node ci/sync-theme.mjs --check
+```
+
+The shared stylesheet is a source asset, not a runtime dependency: Kanidm
+still loads only `override.css`. Playwright checks token synchronization.
+Archaic normally uses Oat for first-party pages; Kanidm supplies Bootstrap,
+so the adapter does not import Oat or fork Kanidm.
+
+The system color preference is the default. An explicit
+`data-theme="light"` or `data-theme="dark"` on the root or body overrides
+Heritage colors and native color-scheme; removing it restores system mode.
+Kanidm continues to manage its own `data-bs-theme` for upstream Bootstrap
+behavior. CSS alone cannot provide a persistent theme picker, rewrite the
+upstream heading structure, replace every functional upstream icon safely,
+or synchronize all upstream theme-dependent image assets with an explicit
+override. These remain deliberate integration limits, not reasons to
+change authentication markup or hide essential controls. New interface
+icons must use Lucide; product logos are not interface icons.
 
 ## CI screenshots
 

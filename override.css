@@ -1,47 +1,46 @@
 /*
  * Archaic Heritage for Kanidm (Bootstrap adapter, CSS-only).
  *
- * The paired palette below mirrors the canonical Archaic Heritage v0.3 palette from
- * archaic-web-design/assets/archaic-theme.css. Kanidm serves just one
- * /hpkg/override.css file and uses Bootstrap, not Oat, so this file
- * translates those tokens without altering upstream markup or login flows.
- *
- * Keep the paired tokens aligned with the canonical family stylesheet.
- * No webfonts, JS, shadows, gradients or decorative rounded panels.
+ * The generated token block comes from assets/archaic-theme.css (Heritage v0.4).
+ * Run node ci/sync-theme.mjs after updating that canonical source. Kanidm serves
+ * one /hpkg/override.css file and uses Bootstrap, not Oat; this adapter keeps
+ * upstream markup and authentication flows intact.
+ * No webfonts, JS, decorative shadows, gradients or rounded panels.
  */
 
+/* BEGIN GENERATED HERITAGE TOKENS */
 :root {
   color-scheme: light dark;
-
-  --archaic-paper: light-dark(#f7f5ee, #171d1a);
+  --archaic-paper: light-dark(#f7f5ee, #000000);
   --archaic-ink: light-dark(#242922, #ecede4);
   --archaic-muted-ink: light-dark(#5d6259, #b2b9b1);
   --archaic-blue: light-dark(#285b78, #93c5df);
-  --archaic-rule: light-dark(#b8bbb0, #4b5752);
-  --archaic-tint: light-dark(#edf0eb, #232b27);
-  --archaic-card: light-dark(#f7f5ee, #232b27);
+  --archaic-rule: light-dark(#b8bbb0, #343d38);
+  --archaic-tint: light-dark(#edf0eb, #101512);
+  --archaic-card: light-dark(#f7f5ee, #101512);
   --archaic-input-border: light-dark(#5d6259, #899b91);
   --archaic-on-blue: light-dark(#f7f5ee, #13232b);
   --archaic-error: light-dark(#963c2e, #f29b8f);
   --archaic-success: light-dark(#376143, #88caa2);
   --archaic-warning: light-dark(#805a16, #e8c177);
-  --archaic-on-status: light-dark(#f7f5ee, #171d1a);
-
-  /* Family spacing and native typography roles; the Kanidm adapter is CSS-only. */
+  --archaic-on-status: light-dark(#f7f5ee, #000000);
+  --font-sans: sans-serif;
+  --font-mono: monospace;
+  --font-semibold: 500;
+  --font-bold: 600;
   --archaic-space-sm: .75rem;
   --archaic-space-md: 1.5rem;
   --archaic-space-lg: 2.5rem;
   --archaic-space-xl: 4rem;
-  --font-sans: sans-serif;
-  --font-mono: monospace;
 }
+/* END GENERATED HERITAGE TOKENS */
 
-/*
- * Kanidm's /pkg/style.js sets data-bs-theme based on the OS preference.
- * Reuse that existing mechanism rather than adding a conflicting switch.
+/* Kanidm still manages data-bs-theme for its Bootstrap components.
+ * Heritage follows the OS directly; an explicit data-theme wins.
+ * CSS cannot add a persistent user-facing theme selector to upstream HTML.
  */
-:root[data-bs-theme="light"] { color-scheme: light; }
-:root[data-bs-theme="dark"] { color-scheme: dark; }
+:root[data-theme="light"], body[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"], body[data-theme="dark"] { color-scheme: dark; }
 
 /* Bootstrap-facing semantic bridge. */
 :root,
@@ -49,7 +48,9 @@
 :root[data-bs-theme="dark"] {
   --bs-body-bg: var(--archaic-paper);
   --bs-body-color: var(--archaic-ink);
-  --bs-body-font-family: sans-serif;
+  --bs-body-font-family: var(--font-sans);
+  --bs-font-sans-serif: var(--font-sans);
+  --bs-font-monospace: var(--font-mono);
   --bs-body-line-height: 1.55;
   --bs-heading-color: var(--archaic-ink);
   --bs-emphasis-color: var(--archaic-ink);
@@ -97,29 +98,20 @@ body {
   text-align: start;
 }
 
-/* Structural UI is sans; explanatory prose is serif even within content. */
+/* Sans for communication, including instructions nested in forms. */
 #main :is(p, blockquote) {
-  font-family: serif;
-  line-height: 1.6;
-  text-align: start;
-}
-
-/* Operational paragraphs inside controls, tables and feedback remain sans. */
-#main :is(form, table, .breadcrumb, .list-group, .card, .alert, .toast) p {
   font-family: var(--font-sans);
-  line-height: 1.55;
-}
-
-/* Credential instructions are explanations, although Kanidm nests them in a form. */
-#main #credentialUpdateStatusForm p:not(:has(> button)) {
-  font-family: serif;
   line-height: 1.6;
+  text-align: start !important;
 }
 
-/* User and domain facts are operational metadata, not editorial prose. */
+#main :is(table, .breadcrumb, .list-group, .alert, .toast) p,
 #main .form-cred-reset-body > div:first-child > p {
-  font-family: var(--font-sans);
   line-height: 1.55;
+}
+
+#main :is(h1, h2, h3, h4, h5, h6):is(.fw-bold, .fw-bolder) {
+  font-weight: 500 !important;
 }
 
 #main :is(code, pre, kbd, samp, .font-monospace) {
@@ -142,8 +134,16 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-:focus-visible {
-  outline: 3px solid var(--archaic-blue) !important;
+/* One keyboard indicator per control. Text fields use their focused
+ * border and a narrow functional ring; other interactive elements use an outline.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--archaic-blue);
+  outline-offset: 3px;
+}
+
+:is(.btn, .form-check-input, .navbar-toggler):focus-visible {
+  outline: 2px solid var(--archaic-blue) !important;
   outline-offset: 3px;
 }
 
@@ -195,7 +195,7 @@ nav.navbar .nav-link:hover {
 nav.navbar .navbar-toggler {
   color: var(--archaic-ink);
   background: transparent;
-  border: 1px solid var(--archaic-rule);
+  border: 1px solid var(--archaic-input-border);
   border-radius: 0;
   box-shadow: none;
 }
@@ -251,7 +251,7 @@ hr {
   width: 3.5rem;
   height: 3.5rem;
   object-fit: contain;
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--archaic-space-md);
 }
 
 .form-signin > h3 {
@@ -282,7 +282,7 @@ hr {
 }
 
 .form-signin .btn-primary[type="submit"] {
-  min-width: 8.75rem;
+  min-width: min(8.75rem, 100%);
 }
 
 /* Native controls: square, well-defined, and keyboard visible. */
@@ -313,7 +313,8 @@ hr {
   background: var(--archaic-paper);
   color: var(--archaic-ink);
   border-color: var(--archaic-blue);
-  box-shadow: none;
+  box-shadow: 0 0 0 1px var(--archaic-blue) !important;
+  outline: none;
 }
 
 .form-control:read-only {
@@ -364,7 +365,7 @@ hr {
 .btn-outline-secondary {
   --bs-btn-color: var(--archaic-ink);
   --bs-btn-bg: var(--archaic-tint);
-  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-border-color: var(--archaic-input-border);
   --bs-btn-hover-color: var(--archaic-on-blue);
   --bs-btn-hover-bg: var(--archaic-blue);
   --bs-btn-hover-border-color: var(--archaic-blue);
@@ -398,6 +399,63 @@ hr {
   --bs-btn-color: var(--archaic-on-status);
   --bs-btn-bg: var(--archaic-warning);
   --bs-btn-border-color: var(--archaic-warning);
+}
+
+/* Complete Bootstrap state mappings; leave blue for actual primary actions. */
+.btn-success {
+  --bs-btn-hover-color: var(--archaic-on-status);
+  --bs-btn-hover-bg: var(--archaic-success);
+  --bs-btn-hover-border-color: var(--archaic-ink);
+  --bs-btn-active-color: var(--archaic-on-status);
+  --bs-btn-active-bg: var(--archaic-success);
+  --bs-btn-active-border-color: var(--archaic-ink);
+}
+
+.btn-warning {
+  --bs-btn-hover-color: var(--archaic-on-status);
+  --bs-btn-hover-bg: var(--archaic-warning);
+  --bs-btn-hover-border-color: var(--archaic-ink);
+  --bs-btn-active-color: var(--archaic-on-status);
+  --bs-btn-active-bg: var(--archaic-warning);
+  --bs-btn-active-border-color: var(--archaic-ink);
+}
+
+.btn-danger,
+.btn-outline-danger {
+  --bs-btn-active-color: var(--archaic-on-status);
+  --bs-btn-active-bg: var(--archaic-error);
+  --bs-btn-active-border-color: var(--archaic-ink);
+}
+
+.btn:is(:disabled, .disabled) {
+  --bs-btn-disabled-color: var(--archaic-muted-ink);
+  --bs-btn-disabled-bg: var(--archaic-tint);
+  --bs-btn-disabled-border-color: var(--archaic-input-border);
+  --bs-btn-disabled-opacity: 1;
+}
+
+.modal-content {
+  --bs-modal-bg: var(--archaic-card);
+  --bs-modal-color: var(--archaic-ink);
+  --bs-modal-border-color: var(--archaic-rule);
+}
+
+.dropdown-menu {
+  --bs-dropdown-bg: var(--archaic-card);
+  --bs-dropdown-color: var(--archaic-ink);
+  --bs-dropdown-border-color: var(--archaic-rule);
+  --bs-dropdown-link-color: var(--archaic-ink);
+  --bs-dropdown-link-hover-color: var(--archaic-ink);
+  --bs-dropdown-link-hover-bg: var(--archaic-tint);
+  --bs-dropdown-link-active-color: var(--archaic-on-blue);
+  --bs-dropdown-link-active-bg: var(--archaic-blue);
+  --bs-dropdown-link-disabled-color: var(--archaic-muted-ink);
+}
+
+.toast {
+  --bs-toast-bg: var(--archaic-card);
+  --bs-toast-color: var(--archaic-ink);
+  --bs-toast-border-color: var(--archaic-rule);
 }
 
 /* Profile and administrator navigation. */
@@ -444,15 +502,6 @@ hr {
   min-width: 0;
 }
 
-#settings-window > div > h2 {
-  margin-bottom: 0.85rem;
-}
-
-#settings-window > hr {
-  margin-top: 1.15rem;
-  margin-bottom: 1.5rem;
-}
-
 /* Content and tables: meaningful edges, no visual card stacks. */
 .card {
   --bs-card-bg: var(--archaic-card);
@@ -497,11 +546,6 @@ hr {
   --bs-breadcrumb-divider-color: var(--archaic-muted-ink);
 }
 
-#cred-update-commit-bar {
-  background: var(--archaic-paper);
-  border-top: 1px solid var(--archaic-rule);
-}
-
 .alert {
   color: var(--archaic-ink);
   background: var(--archaic-tint);
@@ -542,7 +586,8 @@ hr {
 }
 
 #credentialUpdateStatusForm hr.my-4 {
-  margin-block: var(--archaic-space-md) !important;
+  margin-block: var(--archaic-space-lg) !important;
+  border-top: 3px solid var(--archaic-ink);
 }
 
 #settings-window .form-cred-reset-body strong,
@@ -577,7 +622,7 @@ hr {
 
 #cred-reset-form center .kanidm_logo {
   display: block;
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--archaic-space-md);
 }
 
 #cred-reset-form center h2 {
@@ -614,14 +659,16 @@ hr {
  * oversized centered promotional cards. Retain real OAuth2 icons.
  */
 #main > main.container-lg > .row:has(.oauth2-img) {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   margin: 0;
+  max-width: 68ch;
+  border-top: 1px solid var(--archaic-rule);
 }
 
 #main > main.container-lg > .row:has(.oauth2-img) > .col-md-3 {
-  width: auto;
+  width: 100%;
   max-width: none;
   padding: 0;
 }
@@ -630,11 +677,13 @@ hr {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.8rem;
+  gap: var(--archaic-space-md);
   min-height: 4.5rem;
-  padding: 0.8rem;
-  text-align: left !important;
-  border-top: 1px solid var(--archaic-rule);
+  padding: var(--archaic-space-sm) 0;
+  text-align: start !important;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--archaic-rule);
 }
 
 #main .card.text-center:has(.oauth2-img) > a {
@@ -671,9 +720,9 @@ hr {
   overflow-wrap: anywhere;
 }
 
-#main .card.text-center:has(.oauth2-img):hover {
+#main .card.text-center:has(.oauth2-img):is(:hover, :focus-within) {
   background: var(--archaic-tint);
-  border-color: var(--archaic-blue);
+  border-color: var(--archaic-rule);
 }
 
 /* Dense administration: let field and row content carry the emphasis. */
@@ -683,6 +732,10 @@ hr {
 #main > main.container-xxl .list-group.side-menu img {
   display: none;
 }
+
+/* Product logos and existing functional upstream icons remain intact.
+ * New interface icons, if needed, must use Lucide; do not hide icon-only actions.
+ */
 
 #main > main.container-xxl h4 {
   font-size: 1.2rem;
@@ -722,7 +775,7 @@ hr {
 #main > main.container-xxl .table .btn-danger {
   --bs-btn-color: var(--archaic-error);
   --bs-btn-bg: transparent;
-  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-border-color: var(--archaic-error);
   --bs-btn-hover-color: var(--archaic-on-status);
   --bs-btn-hover-bg: var(--archaic-error);
   --bs-btn-hover-border-color: var(--archaic-error);
@@ -741,7 +794,7 @@ hr {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
   align-items: stretch;
-  gap: 0.65rem;
+  gap: var(--archaic-space-sm);
 }
 
 #main main.container-xxl form[hx-post="/ui/api/admin/person/create"] .input-group {
@@ -813,7 +866,7 @@ hr {
  */
 #credentialUpdateStatusForm .list-group-item .d-flex.justify-content-between {
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--archaic-space-sm);
   min-width: 0;
 }
 
@@ -908,7 +961,7 @@ hr {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--archaic-space-md);
 }
 
 #cred-update-commit-bar .toast-body > .mt-3.d-flex {
@@ -927,7 +980,7 @@ hr {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
   align-items: center;
-  gap: 1rem;
+  gap: var(--archaic-space-md);
 }
 
 #radiusUpdateDynamicSection > div > p {
@@ -981,7 +1034,7 @@ hr {
 
   #radiusUpdateDynamicSection > div {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.65rem;
+    row-gap: var(--archaic-space-sm);
   }
 
   #radiusUpdateDynamicSection > div > p:has(> button) {
@@ -1009,10 +1062,13 @@ hr {
 #cred-update-commit-bar .btn-danger {
   --bs-btn-color: var(--archaic-muted-ink);
   --bs-btn-bg: transparent;
-  --bs-btn-border-color: var(--archaic-rule);
+  --bs-btn-border-color: var(--archaic-input-border);
   --bs-btn-hover-color: var(--archaic-ink);
   --bs-btn-hover-bg: var(--archaic-tint);
-  --bs-btn-hover-border-color: var(--archaic-rule);
+  --bs-btn-hover-border-color: var(--archaic-input-border);
+  --bs-btn-active-color: var(--archaic-ink);
+  --bs-btn-active-bg: var(--archaic-tint);
+  --bs-btn-active-border-color: var(--archaic-input-border);
 }
 
 #cred-update-commit-bar .btn-success {
@@ -1023,9 +1079,12 @@ hr {
   --bs-btn-hover-color: var(--archaic-paper);
   --bs-btn-hover-bg: var(--archaic-ink);
   --bs-btn-hover-border-color: var(--archaic-ink);
+  --bs-btn-active-color: var(--archaic-paper);
+  --bs-btn-active-bg: var(--archaic-ink);
+  --bs-btn-active-border-color: var(--archaic-ink);
   --bs-btn-disabled-color: var(--archaic-muted-ink);
   --bs-btn-disabled-bg: var(--archaic-tint);
-  --bs-btn-disabled-border-color: var(--archaic-rule);
+  --bs-btn-disabled-border-color: var(--archaic-input-border);
   --bs-btn-disabled-opacity: 1;
 }
 
@@ -1037,18 +1096,16 @@ hr {
   --bs-btn-hover-color: var(--archaic-paper);
   --bs-btn-hover-bg: var(--archaic-ink);
   --bs-btn-hover-border-color: var(--archaic-ink);
-}
-
-/* Focus is one clean ring, rather than a blue border plus blue outline. */
-:is(.form-control, .form-select):focus-visible {
-  border-color: var(--archaic-input-border);
+  --bs-btn-active-color: var(--archaic-paper);
+  --bs-btn-active-bg: var(--archaic-ink);
+  --bs-btn-active-border-color: var(--archaic-ink);
 }
 
 /* Mobile: compact scrollable navigation, independent content region. */
 @media (max-width: 47.999rem) {
   nav.navbar {
-    padding-block: 0.75rem;
-    margin-bottom: 1.4rem !important;
+    padding-block: var(--archaic-space-md);
+    margin-bottom: var(--archaic-space-md) !important;
   }
 
   nav.navbar .navbar-brand {
@@ -1178,7 +1235,7 @@ hr {
 @media (max-width: 22rem) {
   .form-signin {
     width: calc(100% - 2rem);
-    padding-block: 1.7rem;
+    padding-block: var(--archaic-space-md);
   }
 
   nav.navbar .navbar-brand {
@@ -1233,7 +1290,7 @@ nav.navbar a.navbar-brand::before {
 
 #main.form-signin::before,
 #cred-reset-form center::before {
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--archaic-space-md);
 }
 
 nav.navbar a.navbar-brand::before {
